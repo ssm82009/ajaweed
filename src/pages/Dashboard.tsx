@@ -22,7 +22,7 @@ const Dashboard = () => {
         },
         {
             to: "/notes",
-            title: "الملاحظات السلوكية",
+            title: "ملاحظات المعلمين",
             description: "توثيق ومتابعة ملاحظات المعلمين والتواصل",
             icon: <BookOpen size={40} className="text-white" />,
             color: "from-emerald-500 to-teal-700",

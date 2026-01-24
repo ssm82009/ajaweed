@@ -269,7 +269,7 @@ const TeacherDashboard = () => {
                                     <button onClick={() => {
                                         const printContent = document.getElementById(`print-${studentName}`)?.innerHTML;
                                         const win = window.open('', '', 'height=700,width=900');
-                                        win?.document.write(`<html><head><title>تقرير الطالب ${studentName}</title><style>body { font-family: 'Cairo', sans-serif; direction: rtl; } .no-print { display: none; } table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { border: 1px solid #ddd; padding: 8px; text-align: right; } th { background-color: #f2f2f2; }</style></head><body><h1>تقرير الملاحظات السلوكية</h1><h2>الطالب: ${studentName}</h2>${printContent}</body></html>`);
+                                        win?.document.write(`<html><head><title>تقرير الطالب ${studentName}</title><style>body { font-family: 'Cairo', sans-serif; direction: rtl; } .no-print { display: none; } table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { border: 1px solid #ddd; padding: 8px; text-align: right; } th { background-color: #f2f2f2; }</style></head><body><h1>تقرير ملاحظات المعلمين</h1><h2>الطالب: ${studentName}</h2>${printContent}</body></html>`);
                                         win?.document.close();
                                         win?.print();
                                     }} className="text-sm border border-gray-300 hover:bg-gray-100 px-4 py-2 rounded-xl transition-colors flex items-center gap-2">
