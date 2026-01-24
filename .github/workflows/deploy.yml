@@ -35,7 +35,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           # We only copy the necessary production files
-          source: "dist/*,server/*,package.json,package-lock.json,startup.cjs"
+          source: "dist/*,server/*,package.json,package-lock.json,startup.cjs,app.js"
           target: "/home/ajaweed/ajaweed_app"
           strip_components: 0
 

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import multer from 'multer';
 import XLSX from 'xlsx';
 import fs from 'fs';
-import db from './db.js';
+import db from './db.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
