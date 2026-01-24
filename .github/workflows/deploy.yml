@@ -39,7 +39,7 @@ jobs:
           target: "/home/ajaweed/ajaweed_app"
           strip_components: 0
 
-      - name: Post-Deploy Tasks (Install Deps & Restart)
+      - name: Post-Deploy Tasks (Create .env, Install Deps & Restart)
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.REMOTE_HOST }}
@@ -52,6 +52,10 @@ jobs:
             
             cd /home/ajaweed/ajaweed_app
             
+            # Create/Update .env file from secrets
+            echo "TURSO_URL=${{ secrets.TURSO_URL }}" > .env
+            echo "TURSO_AUTH_TOKEN=${{ secrets.TURSO_AUTH_TOKEN }}" >> .env
+            
             # Install production dependencies only
             npm ci --production
             
@@ -59,4 +63,4 @@ jobs:
             mkdir -p tmp
             touch tmp/restart.txt
             
-            echo "Deployment Complete and App Restarted"
+            echo "Deployment Complete and App Restarted with Turso Config"
