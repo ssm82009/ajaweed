@@ -23,7 +23,7 @@ app.get('/api/health', (req, res) => {
 });
 
 /* ================= STUDENTS ================= */
-app.get('/api/students', (req, res) => {
+app.get('/api/students', async (req, res) => {
     const { query, class_name, grade } = req.query;
     let sql = "SELECT * FROM students WHERE 1=1";
     let params = [];
@@ -41,23 +41,30 @@ app.get('/api/students', (req, res) => {
         params.push(grade);
     }
 
-    db.all(sql, params, (err, rows) => {
-        if (err) return res.status(400).json({ "error": err.message });
-        res.json({ "message": "success", "data": rows });
-    });
+    try {
+        const result = await db.execute({ sql, args: params });
+        res.json({ "message": "success", "data": result.rows });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
-app.post('/api/student/login', (req, res) => {
+app.post('/api/student/login', async (req, res) => {
     const { national_id } = req.body;
-    db.get("SELECT * FROM students WHERE national_id = ?", [national_id], (err, row) => {
-        if (err) return res.status(400).json({ "error": err.message });
-        if (row) res.json({ "message": "success", "data": row });
+    try {
+        const result = await db.execute({
+            sql: "SELECT * FROM students WHERE national_id = ?",
+            args: [national_id]
+        });
+        if (result.rows.length > 0) res.json({ "message": "success", "data": result.rows[0] });
         else res.status(404).json({ "error": "Student not found" });
-    });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 // Import Students
-app.post('/api/upload-students', upload.single('file'), (req, res) => {
+app.post('/api/upload-students', upload.single('file'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     try {
         const workbook = XLSX.readFile(req.file.path);
@@ -65,27 +72,28 @@ app.post('/api/upload-students', upload.single('file'), (req, res) => {
         const data = XLSX.utils.sheet_to_json(sheet);
         let successCount = 0;
 
-        const insertStmt = db.prepare(`INSERT OR REPLACE INTO students (name, national_id, grade, class_name) VALUES (?, ?, ?, ?)`);
-        db.serialize(() => {
-            db.run("BEGIN TRANSACTION");
-            data.forEach((row) => {
-                let values = Object.values(row);
-                let name = row['اسم الطالب'] || values[0];
-                let national_id = row['رقم الهوية'] || values[1];
-                let grade = row['الصف'] || values[2];
-                let class_name = row['الفصل'] || values[3];
-                if (name && national_id) {
-                    insertStmt.run(name, national_id, grade, class_name, (err) => {
-                        if (!err) successCount++;
-                    });
-                }
-            });
-            db.run("COMMIT", () => {
-                fs.unlinkSync(req.file.path);
-                res.json({ message: 'Processing complete', success: successCount });
-            });
+        const statements = [];
+        data.forEach((row) => {
+            let values = Object.values(row);
+            let name = row['اسم الطالب'] || values[0];
+            let national_id = row['رقم الهوية'] || values[1];
+            let grade = row['الصف'] || values[2];
+            let class_name = row['الفصل'] || values[3];
+            if (name && national_id) {
+                statements.push({
+                    sql: `INSERT OR REPLACE INTO students (name, national_id, grade, class_name) VALUES (?, ?, ?, ?)`,
+                    args: [name, national_id, grade, class_name]
+                });
+            }
         });
-        insertStmt.finalize();
+
+        if (statements.length > 0) {
+            await db.batch(statements, "write");
+            successCount = statements.length;
+        }
+
+        fs.unlinkSync(req.file.path);
+        res.json({ message: 'Processing complete', success: successCount });
     } catch (error) {
         if (req.file) fs.unlinkSync(req.file.path);
         res.status(500).json({ error: error.message });
@@ -93,17 +101,22 @@ app.post('/api/upload-students', upload.single('file'), (req, res) => {
 });
 
 /* ================= TEACHERS ================= */
-app.post('/api/teacher/login', (req, res) => {
+app.post('/api/teacher/login', async (req, res) => {
     const { national_id } = req.body;
-    db.get("SELECT * FROM teachers WHERE national_id = ?", [national_id], (err, row) => {
-        if (err) return res.status(400).json({ "error": err.message });
-        if (row) res.json({ "message": "success", "data": row });
+    try {
+        const result = await db.execute({
+            sql: "SELECT * FROM teachers WHERE national_id = ?",
+            args: [national_id]
+        });
+        if (result.rows.length > 0) res.json({ "message": "success", "data": result.rows[0] });
         else res.status(404).json({ "error": "Teacher not found" });
-    });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 // Import Teachers
-app.post('/api/upload-teachers', upload.single('file'), (req, res) => {
+app.post('/api/upload-teachers', upload.single('file'), async (req, res) => {
     if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
     try {
         const workbook = XLSX.readFile(req.file.path);
@@ -111,28 +124,28 @@ app.post('/api/upload-teachers', upload.single('file'), (req, res) => {
         const data = XLSX.utils.sheet_to_json(sheet);
         let successCount = 0;
 
-        const insertStmt = db.prepare(`INSERT OR REPLACE INTO teachers (name, national_id, subject) VALUES (?, ?, ?)`);
-        db.serialize(() => {
-            db.run("BEGIN TRANSACTION");
-            data.forEach((row) => {
-                // "اسم المعلم", "رقم الهوية", "مادة التدريس"
-                let values = Object.values(row);
-                let name = row['اسم المعلم'] || values[0];
-                let national_id = row['رقم الهوية'] || values[1];
-                let subject = row['مادة التدريس'] || values[2];
+        const statements = [];
+        data.forEach((row) => {
+            let values = Object.values(row);
+            let name = row['اسم المعلم'] || values[0];
+            let national_id = row['رقم الهوية'] || values[1];
+            let subject = row['مادة التدريس'] || values[2];
 
-                if (name && national_id) {
-                    insertStmt.run(name, national_id, subject, (err) => {
-                        if (!err) successCount++;
-                    });
-                }
-            });
-            db.run("COMMIT", () => {
-                fs.unlinkSync(req.file.path);
-                res.json({ message: 'Processing complete', success: successCount });
-            });
+            if (name && national_id) {
+                statements.push({
+                    sql: `INSERT OR REPLACE INTO teachers (name, national_id, subject) VALUES (?, ?, ?)`,
+                    args: [name, national_id, subject]
+                });
+            }
         });
-        insertStmt.finalize();
+
+        if (statements.length > 0) {
+            await db.batch(statements, "write");
+            successCount = statements.length;
+        }
+
+        fs.unlinkSync(req.file.path);
+        res.json({ message: 'Processing complete', success: successCount });
     } catch (error) {
         if (req.file) fs.unlinkSync(req.file.path);
         res.status(500).json({ error: error.message });
@@ -141,19 +154,21 @@ app.post('/api/upload-teachers', upload.single('file'), (req, res) => {
 
 /* ================= NOTES & MESSAGING ================= */
 // Create Note/Star/Message
-app.post('/api/notes', (req, res) => {
+app.post('/api/notes', async (req, res) => {
     const { student_id, teacher_id, sender_type, type, sentiment, content } = req.body;
-    db.run(`INSERT INTO notes (student_id, teacher_id, sender_type, type, sentiment, content) VALUES (?, ?, ?, ?, ?, ?)`,
-        [student_id, teacher_id, sender_type, type, sentiment, content],
-        function (err) {
-            if (err) return res.status(400).json({ "error": err.message });
-            res.json({ "message": "success", "data": { id: this.lastID } });
-        }
-    );
+    try {
+        const result = await db.execute({
+            sql: `INSERT INTO notes (student_id, teacher_id, sender_type, type, sentiment, content) VALUES (?, ?, ?, ?, ?, ?)`,
+            args: [student_id, teacher_id, sender_type, type, sentiment, content]
+        });
+        res.json({ "message": "success", "data": { id: Number(result.lastInsertRowid) } });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 // Get Notes for Student
-app.get('/api/notes/student/:id', (req, res) => {
+app.get('/api/notes/student/:id', async (req, res) => {
     const sql = `
         SELECT 
             notes.*, 
@@ -164,22 +179,29 @@ app.get('/api/notes/student/:id', (req, res) => {
         WHERE notes.student_id = ? 
         ORDER BY notes.created_at DESC`;
 
-    db.all(sql, [req.params.id], (err, rows) => {
-        if (err) return res.status(400).json({ "error": err.message });
-        res.json({ "message": "success", "data": rows });
-    });
+    try {
+        const result = await db.execute({ sql, args: [req.params.id] });
+        res.json({ "message": "success", "data": result.rows });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 // Mark Note as Read
-app.post('/api/notes/read/:id', (req, res) => {
-    db.run(`UPDATE notes SET is_read = 1 WHERE id = ?`, [req.params.id], function (err) {
-        if (err) return res.status(400).json({ "error": err.message });
-        res.json({ "message": "success", "changes": this.changes });
-    });
+app.post('/api/notes/read/:id', async (req, res) => {
+    try {
+        const result = await db.execute({
+            sql: `UPDATE notes SET is_read = 1 WHERE id = ?`,
+            args: [req.params.id]
+        });
+        res.json({ "message": "success", "changes": result.rowsAffected });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 // Get Notes Sent by Teacher (for dashboard)
-app.get('/api/notes/teacher/:id', (req, res) => {
+app.get('/api/notes/teacher/:id', async (req, res) => {
     const sql = `
         SELECT 
             notes.*, 
@@ -189,14 +211,16 @@ app.get('/api/notes/teacher/:id', (req, res) => {
         WHERE notes.teacher_id = ? 
         ORDER BY notes.created_at DESC`;
 
-    db.all(sql, [req.params.id], (err, rows) => {
-        if (err) return res.status(400).json({ "error": err.message });
-        res.json({ "message": "success", "data": rows });
-    });
+    try {
+        const result = await db.execute({ sql, args: [req.params.id] });
+        res.json({ "message": "success", "data": result.rows });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 // Admin All Notes View
-app.get('/api/admin/notes', (req, res) => {
+app.get('/api/admin/notes', async (req, res) => {
     const sql = `
         SELECT 
             notes.*, 
@@ -207,10 +231,12 @@ app.get('/api/admin/notes', (req, res) => {
         LEFT JOIN teachers ON notes.teacher_id = teachers.id
         ORDER BY notes.created_at DESC LIMIT 100`;
 
-    db.all(sql, [], (err, rows) => {
-        if (err) return res.status(400).json({ "error": err.message });
-        res.json({ "message": "success", "data": rows });
-    });
+    try {
+        const result = await db.execute(sql);
+        res.json({ "message": "success", "data": result.rows });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 
@@ -219,45 +245,56 @@ app.get('/api/admin/notes', (req, res) => {
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use(express.static(path.join(__dirname, '../dist')));
 
-app.get('/api/honor', (req, res) => {
-    db.all("SELECT * FROM honor_board ORDER BY id DESC", [], (err, rows) => {
-        if (err) {
-            res.status(400).json({ "error": err.message });
-            return;
-        }
-        res.json({ "message": "success", "data": rows });
-    });
+app.get('/api/honor', async (req, res) => {
+    try {
+        const result = await db.execute("SELECT * FROM honor_board ORDER BY id DESC");
+        res.json({ "message": "success", "data": result.rows });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
-app.post('/api/honor', upload.single('image'), (req, res) => {
+app.post('/api/honor', upload.single('image'), async (req, res) => {
     const { title, description, category } = req.body;
     const image_path = req.file ? `/uploads/${req.file.filename}` : null;
 
-    db.run(`INSERT INTO honor_board (title, description, category, image_path, date) VALUES (?, ?, ?, ?, ?)`,
-        [title, description, category, image_path, new Date().toISOString()],
-        function (err) {
-            if (err) return res.status(400).json({ "error": err.message });
-            res.json({ "message": "success", "data": { id: this.lastID } });
+    try {
+        const result = await db.execute({
+            sql: `INSERT INTO honor_board (title, description, category, image_path, date) VALUES (?, ?, ?, ?, ?)`,
+            args: [title, description, category, image_path, new Date().toISOString()]
         });
+        res.json({ "message": "success", "data": { id: Number(result.lastInsertRowid) } });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
-app.post('/api/honor/delete/:id', (req, res) => {
-    db.run(`DELETE FROM honor_board WHERE id = ?`, req.params.id, function (err) {
-        if (err) return res.status(400).json({ "error": err.message });
-        res.json({ "message": "deleted", changes: this.changes });
-    });
+app.post('/api/honor/delete/:id', async (req, res) => {
+    try {
+        const result = await db.execute({
+            sql: `DELETE FROM honor_board WHERE id = ?`,
+            args: [req.params.id]
+        });
+        res.json({ "message": "deleted", changes: result.rowsAffected });
+    } catch (err) {
+        res.status(400).json({ "error": err.message });
+    }
 });
 
 /* ================= ATTENDANCE ================= */
 
 // Helper to get settings
-const getSetting = (key) => {
-    return new Promise((resolve, reject) => {
-        db.get("SELECT value FROM app_settings WHERE key = ?", [key], (err, row) => {
-            if (err) reject(err);
-            resolve(row ? row.value : null);
+const getSetting = async (key) => {
+    try {
+        const result = await db.execute({
+            sql: "SELECT value FROM app_settings WHERE key = ?",
+            args: [key]
         });
-    });
+        return result.rows.length > 0 ? result.rows[0].value : null;
+    } catch (err) {
+        console.error(err);
+        return null;
+    }
 };
 
 app.post('/api/attendance/login', async (req, res) => {
@@ -276,42 +313,67 @@ app.get('/api/attendance/settings', async (req, res) => {
     } catch (err) { res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/attendance/settings', (req, res) => {
+app.post('/api/attendance/settings', async (req, res) => {
     const { password, threshold } = req.body;
-    db.serialize(() => {
-        if (password) db.run("INSERT OR REPLACE INTO app_settings (key, value) VALUES ('attendance_password', ?)", [password]);
-        if (threshold) db.run("INSERT OR REPLACE INTO app_settings (key, value) VALUES ('late_threshold', ?)", [threshold]);
+    try {
+        const statements = [];
+        if (password) {
+            statements.push({
+                sql: "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('attendance_password', ?)",
+                args: [password]
+            });
+        }
+        if (threshold) {
+            statements.push({
+                sql: "INSERT OR REPLACE INTO app_settings (key, value) VALUES ('late_threshold', ?)",
+                args: [threshold]
+            });
+        }
+        if (statements.length > 0) {
+            await db.batch(statements, "write");
+        }
         res.json({ success: true });
-    });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
-app.get('/api/attendance/student/:nid', (req, res) => {
+app.get('/api/attendance/student/:nid', async (req, res) => {
     const nid = req.params.nid;
 
-    // First get student info
-    db.get("SELECT * FROM students WHERE national_id = ?", [nid], (err, student) => {
-        if (err || !student) return res.status(404).json({ error: "Student not found" });
+    try {
+        // First get student info
+        const studentResult = await db.execute({
+            sql: "SELECT * FROM students WHERE national_id = ?",
+            args: [nid]
+        });
+
+        if (studentResult.rows.length === 0) return res.status(404).json({ error: "Student not found" });
+        const student = studentResult.rows[0];
 
         // Get attendance records
-        db.all("SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC", [student.id], (err, records) => {
-            if (err) return res.status(500).json({ error: err.message });
-
-            // Calculate Scores
-            // Early (+3), Late (+1), Absent (-1)
-            let totalPoints = 0;
-            records.forEach(r => {
-                totalPoints += (r.points || 0);
-            });
-
-            res.json({
-                student,
-                records,
-                stats: {
-                    totalPoints
-                }
-            });
+        const attendanceResult = await db.execute({
+            sql: "SELECT * FROM attendance WHERE student_id = ? ORDER BY date DESC",
+            args: [student.id]
         });
-    });
+        const records = attendanceResult.rows;
+
+        // Calculate Scores
+        let totalPoints = 0;
+        records.forEach(r => {
+            totalPoints += (Number(r.points) || 0);
+        });
+
+        res.json({
+            student,
+            records,
+            stats: {
+                totalPoints
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 app.post('/api/attendance/upload', upload.single('file'), async (req, res) => {
@@ -323,107 +385,117 @@ app.post('/api/attendance/upload', upload.single('file'), async (req, res) => {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const data = XLSX.utils.sheet_to_json(sheet);
 
-        db.all("SELECT id, national_id FROM students", [], (err, allStudents) => {
-            if (err) {
-                if (req.file) fs.unlinkSync(req.file.path);
-                return res.status(500).json({ error: err.message });
+        const studentsResult = await db.execute("SELECT id, national_id FROM students");
+        const allStudents = studentsResult.rows;
+
+        const studentMap = new Map();
+        allStudents.forEach(s => studentMap.set(String(s.national_id), s.id));
+
+        const datesInFile = new Set();
+        const presentStudentsByDate = new Map();
+
+        const attendanceStatements = [];
+        const newStudentStatements = [];
+
+        const manualDate = req.body.date;
+
+        for (const row of data) {
+            const values = Object.values(row);
+            let name = row['اسم الطالب'] || values[0];
+            let grade = row['الصف'] || values[1];
+            let className = row['الفصل'] || values[2];
+            let nid = row['رقم الهوية'] || row['National ID'] || values[3];
+            let dateRaw = row['التاريخ'] || row['Date'] || values[4];
+            let timeRaw = row['وقت الوصول'] || row['Time'] || values[5];
+
+            if (!nid) continue;
+            let nidStr = String(nid).trim();
+
+            let dateStr = manualDate;
+            if (!dateStr) {
+                if (dateRaw instanceof Date) dateStr = dateRaw.toISOString().split('T')[0];
+                else if (typeof dateRaw === 'string') dateStr = dateRaw.trim();
             }
 
-            const studentMap = new Map();
-            allStudents.forEach(s => studentMap.set(s.national_id, s.id));
+            let timeStr = timeRaw;
+            if (timeRaw instanceof Date) {
+                timeStr = timeRaw.toTimeString().slice(0, 5);
+            } else if (typeof timeRaw === 'number') {
+                const totalSeconds = Math.floor(timeRaw * 24 * 60 * 60);
+                const hours = Math.floor(totalSeconds / 3600);
+                const minutes = Math.floor((totalSeconds % 3600) / 60);
+                timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            } else if (typeof timeRaw === 'string') {
+                timeStr = timeRaw.trim();
+                if (timeStr.match(/^\d{1,2}:\d{2}/)) {
+                    const parts = timeStr.split(':');
+                    timeStr = `${String(parts[0]).padStart(2, '0')}:${parts[1]}`;
+                }
+                timeStr = timeStr.slice(0, 5);
+            }
 
-            const datesInFile = new Set();
-            const presentStudentsByDate = new Map();
+            if (!dateStr || !timeStr) continue;
 
-            db.serialize(() => {
-                db.run("BEGIN TRANSACTION");
-
-                const stmt = db.prepare(`INSERT OR REPLACE INTO attendance (student_id, date, time, status, points) VALUES (?, ?, ?, ?, ?)`);
-                const insertStudentStmt = db.prepare(`INSERT INTO students (name, grade, class_name, national_id) VALUES (?, ?, ?, ?)`);
-
-                const manualDate = req.body.date;
-
-                data.forEach(row => {
-                    const values = Object.values(row);
-                    let name = row['اسم الطالب'] || values[0];
-                    let grade = row['الصف'] || values[1];
-                    let className = row['الفصل'] || values[2];
-                    let nid = row['رقم الهوية'] || row['National ID'] || values[3];
-                    let dateRaw = row['التاريخ'] || row['Date'] || values[4];
-                    let timeRaw = row['وقت الوصول'] || row['Time'] || values[5];
-
-                    if (!nid) return;
-                    let nidStr = String(nid).trim();
-
-                    let dateStr = manualDate;
-                    if (!dateStr) {
-                        if (dateRaw instanceof Date) dateStr = dateRaw.toISOString().split('T')[0];
-                        else if (typeof dateRaw === 'string') dateStr = dateRaw.trim();
-                    }
-
-                    let timeStr = timeRaw;
-                    if (timeRaw instanceof Date) {
-                        timeStr = timeRaw.toTimeString().slice(0, 5);
-                    } else if (typeof timeRaw === 'number') {
-                        const totalSeconds = Math.floor(timeRaw * 24 * 60 * 60);
-                        const hours = Math.floor(totalSeconds / 3600);
-                        const minutes = Math.floor((totalSeconds % 3600) / 60);
-                        timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-                    } else if (typeof timeRaw === 'string') {
-                        timeStr = timeRaw.trim();
-                        if (timeStr.match(/^\d{1,2}:\d{2}/)) {
-                            const parts = timeStr.split(':');
-                            timeStr = `${String(parts[0]).padStart(2, '0')}:${parts[1]}`;
-                        }
-                        timeStr = timeStr.slice(0, 5);
-                    }
-
-                    if (!dateStr || !timeStr) return;
-
-                    let sid = studentMap.get(nidStr);
-                    if (!sid && name) {
-                        try {
-                            const info = insertStudentStmt.run(name, grade || '', className || '', nidStr);
-                            sid = info.lastInsertRowid;
-                            studentMap.set(nidStr, sid);
-                        } catch (err) { }
-                    }
-
-                    if (sid) {
-                        datesInFile.add(dateStr);
-                        if (!presentStudentsByDate.has(dateStr)) presentStudentsByDate.set(dateStr, new Set());
-                        presentStudentsByDate.get(dateStr).add(sid);
-
-                        let status = 'early';
-                        let points = 3;
-                        if (timeStr > threshold) {
-                            status = 'late';
-                            points = 1;
-                        }
-                        stmt.run(sid, dateStr, timeStr, status, points);
-                    }
-                });
-
-                stmt.finalize();
-                insertStudentStmt.finalize();
-
-                datesInFile.forEach(date => {
-                    const presentSet = presentStudentsByDate.get(date);
-                    const absentStmt = db.prepare(`INSERT OR IGNORE INTO attendance (student_id, date, time, status, points) VALUES (?, ?, ?, ?, ?)`);
-                    allStudents.forEach(s => {
-                        if (!presentSet.has(s.id)) {
-                            absentStmt.run(s.id, date, '-', 'absent', -1);
-                        }
+            let sid = studentMap.get(nidStr);
+            if (!sid && name) {
+                // We'll insert students first or batch them
+                // For simplicity in conversion, we assume students exist or we add them individually here (slow but safe)
+                try {
+                    const insertRes = await db.execute({
+                        sql: `INSERT INTO students (name, grade, class_name, national_id) VALUES (?, ?, ?, ?)`,
+                        args: [name, grade || '', className || '', nidStr]
                     });
-                    absentStmt.finalize();
-                });
+                    sid = Number(insertRes.lastInsertRowid);
+                    studentMap.set(nidStr, sid);
+                } catch (err) {
+                    // might already exist
+                    const check = await db.execute({ sql: "SELECT id FROM students WHERE national_id = ?", args: [nidStr] });
+                    if (check.rows.length > 0) sid = check.rows[0].id;
+                }
+            }
 
-                db.run("COMMIT", () => {
-                    if (req.file) fs.unlinkSync(req.file.path);
-                    res.json({ success: true, datesProcessed: Array.from(datesInFile) });
+            if (sid) {
+                datesInFile.add(dateStr);
+                if (!presentStudentsByDate.has(dateStr)) presentStudentsByDate.set(dateStr, new Set());
+                presentStudentsByDate.get(dateStr).add(sid);
+
+                let status = 'early';
+                let points = 3;
+                if (timeStr > threshold) {
+                    status = 'late';
+                    points = 1;
+                }
+                attendanceStatements.push({
+                    sql: `INSERT OR REPLACE INTO attendance (student_id, date, time, status, points) VALUES (?, ?, ?, ?, ?)`,
+                    args: [sid, dateStr, timeStr, status, points]
                 });
+            }
+        }
+
+        // Add absent records
+        datesInFile.forEach(date => {
+            const presentSet = presentStudentsByDate.get(date);
+            allStudents.forEach(s => {
+                if (!presentSet.has(s.id)) {
+                    attendanceStatements.push({
+                        sql: `INSERT OR IGNORE INTO attendance (student_id, date, time, status, points) VALUES (?, ?, ?, ?, ?)`,
+                        args: [s.id, date, '-', 'absent', -1]
+                    });
+                }
             });
         });
+
+        if (attendanceStatements.length > 0) {
+            // Batching in chunks if too large (Turso has limits)
+            const chunkSize = 50;
+            for (let i = 0; i < attendanceStatements.length; i += chunkSize) {
+                await db.batch(attendanceStatements.slice(i, i + chunkSize), "write");
+            }
+        }
+
+        if (req.file) fs.unlinkSync(req.file.path);
+        res.json({ success: true, datesProcessed: Array.from(datesInFile) });
+
     } catch (e) {
         if (req.file) fs.unlinkSync(req.file.path);
         res.status(500).json({ error: e.message });
@@ -438,4 +510,3 @@ app.get('*', (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
-
