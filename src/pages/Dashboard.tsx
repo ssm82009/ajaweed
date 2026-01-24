@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ClipboardList, BookOpen, Medal, Search, ArrowLeft, Star, Users } from 'lucide-react';
+import { ClipboardList, BookOpen, Medal, Search, ArrowLeft, Star } from 'lucide-react';
 
 const Dashboard = () => {
     const [searchId, setSearchId] = useState('');
@@ -16,8 +16,8 @@ const Dashboard = () => {
             title: "سجلات الحضور",
             description: "متابعة دقيقة للحضور والغياب اليومي للطلاب",
             icon: <ClipboardList size={40} className="text-white" />,
-            color: "from-blue-500 to-blue-600",
-            shadow: "shadow-blue-500/30",
+            color: "from-primary-600 to-indigo-700",
+            shadow: "shadow-primary-500/40",
             delay: "0"
         },
         {
@@ -25,8 +25,8 @@ const Dashboard = () => {
             title: "الملاحظات السلوكية",
             description: "توثيق ومتابعة ملاحظات المعلمين والتواصل",
             icon: <BookOpen size={40} className="text-white" />,
-            color: "from-indigo-500 to-indigo-600",
-            shadow: "shadow-indigo-500/30",
+            color: "from-emerald-500 to-teal-700",
+            shadow: "shadow-emerald-500/40",
             delay: "100"
         },
         {
@@ -34,8 +34,8 @@ const Dashboard = () => {
             title: "لوحة الشرف",
             description: "تكريم المتميزين وصناعة القدوة الحسنة",
             icon: <Medal size={40} className="text-white" />,
-            color: "from-amber-500 to-amber-600",
-            shadow: "shadow-amber-500/30",
+            color: "from-accent-DEFAULT to-amber-600",
+            shadow: "shadow-amber-500/40",
             delay: "200"
         }
     ];
@@ -116,21 +116,6 @@ const Dashboard = () => {
                         </div>
                     </Link>
                 ))}
-            </div>
-
-            {/* Quick Stats or Footer Info */}
-            <div className="mt-20 flex gap-8 text-center text-slate-400 text-sm animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <div className="flex flex-col items-center gap-1">
-                    <Users size={20} className="mb-2 opacity-50" />
-                    <span className="font-bold text-slate-600 text-lg">1,200+</span>
-                    <span>طالب</span>
-                </div>
-                <div className="w-px h-12 bg-slate-200"></div>
-                <div className="flex flex-col items-center gap-1">
-                    <Users size={20} className="mb-2 opacity-50" />
-                    <span className="font-bold text-slate-600 text-lg">85+</span>
-                    <span>معلم</span>
-                </div>
             </div>
 
         </div>
