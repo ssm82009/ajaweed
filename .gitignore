@@ -4,6 +4,8 @@ dist
 *.db
 *.log
 deploy.zip
+dist.zip
+dist.tar.gz
 id_rsa_ajaweed*
 test_ssh.js
 deploy_cpanel.js
