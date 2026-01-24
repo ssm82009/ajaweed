@@ -16,8 +16,8 @@ const Dashboard = () => {
             title: "سجلات الحضور",
             description: "متابعة دقيقة للحضور والغياب اليومي للطلاب والتقارير",
             icon: <ClipboardList size={40} className="text-white" />,
-            color: "from-indigo-600 to-blue-700",
-            shadow: "shadow-indigo-500/30",
+            color: "from-emerald-500 to-teal-700",
+            shadow: "shadow-emerald-500/40",
             delay: "0"
         },
         {
@@ -26,7 +26,7 @@ const Dashboard = () => {
             description: "توثيق ومتابعة ملاحظات المعلمين والتواصل الفعال",
             icon: <BookOpen size={40} className="text-white" />,
             color: "from-primary-600 to-indigo-700",
-            shadow: "shadow-primary-500/30",
+            shadow: "shadow-primary-500/40",
             delay: "100"
         },
         {
@@ -35,7 +35,7 @@ const Dashboard = () => {
             description: "تكريم المتميزين وصناعة القدوة الحسنة للطلاب",
             icon: <Medal size={40} className="text-white" />,
             color: "from-amber-500 to-orange-600",
-            shadow: "shadow-amber-500/30",
+            shadow: "shadow-amber-500/40",
             delay: "200"
         }
     ];
