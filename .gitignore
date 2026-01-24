@@ -1,0 +1,17 @@
+node_modules
+dist
+.env
+*.db
+*.log
+deploy.zip
+id_rsa_ajaweed*
+test_ssh.js
+deploy_cpanel.js
+deploy_automated.js
+deploy_vps.ps1
+fix_domain.js
+quick_update.js
+setup_cleanup_vps.js
+.DS_Store
+uploads/*
+!uploads/.gitkeep
