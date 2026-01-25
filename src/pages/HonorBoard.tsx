@@ -104,7 +104,7 @@ const HonorBoard = () => {
                                     )}
 
                                     {/* Category Badge - Glassmorphic */}
-                                    <div className={`absolute top-6 right-6 z-20 px-5 py-2.5 rounded-2xl font-black text-sm shadow-xl backdrop-blur-xl border border-white/40 flex items-center gap-2 group-hover:scale-110 transition-transform
+                                    <div className={`absolute bottom-6 right-6 z-20 px-3 py-1.5 rounded-xl font-black text-xs shadow-lg backdrop-blur-xl border border-white/40 flex items-center gap-1.5 group-hover:scale-110 transition-transform
                                         ${style.color === 'amber' ? 'bg-amber-100/90 text-amber-700' :
                                             style.color === 'blue' ? 'bg-indigo-100/90 text-indigo-700' :
                                                 style.color === 'emerald' ? 'bg-emerald-100/90 text-emerald-800' :
