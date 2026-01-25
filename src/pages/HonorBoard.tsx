@@ -116,7 +116,7 @@ const HonorBoard = () => {
 
                                 {/* Content Section */}
                                 <div className="p-10 flex-1 flex flex-col relative z-20 -mt-10">
-                                    <div className={`absolute -top-12 left-10 w-24 h-24 bg-white rounded-3xl shadow-xl flex items-center justify-center text-3xl transform -rotate-6 group-hover:rotate-0 transition-transform border border-slate-50`}>
+                                    <div className={`absolute top-4 left-10 w-24 h-24 bg-white rounded-3xl shadow-xl flex items-center justify-center text-3xl transform -rotate-6 group-hover:rotate-0 transition-transform border border-slate-50`}>
                                         {style.color === 'amber' ? '✨' : style.color === 'blue' ? '🚀' : style.color === 'emerald' ? '🤝' : '🎖️'}
                                     </div>
 
