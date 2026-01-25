@@ -111,7 +111,7 @@ const HonorBoard = () => {
                                                     'bg-purple-100/90 text-purple-700'}`}>
                                         {style.icon}
                                         {style.label}
-                                        {style.color === 'amber' && <span className="text-[10px]">⭐⭐⭐</span>}
+                                        {style.color === 'amber' && <span className="text-sm">🎖️</span>}
                                     </div>
                                 </div>
 
