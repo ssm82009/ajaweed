@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ClipboardList, BookOpen, Medal, Search, ArrowLeft, Star } from 'lucide-react';
+import { ClipboardList, BookOpen, Medal, ArrowLeft, Star } from 'lucide-react';
 
 const Dashboard = () => {
-    const [searchId, setSearchId] = useState('');
-
-    const handleSearch = (e: React.FormEvent) => {
-        e.preventDefault();
-        console.log('Searching for:', searchId);
-    };
-
     const cards = [
         {
             to: "/attendance",
@@ -41,7 +34,7 @@ const Dashboard = () => {
     ];
 
     return (
-        <div className="flex flex-col min-h-[85vh] justify-center items-center py-10 relative px-4 overflow-hidden">
+        <div className="flex flex-col min-h-[85vh] justify-center items-center py-6 md:py-10 relative px-4 overflow-hidden">
 
             {/* Background Decorative Blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-10">
@@ -54,39 +47,19 @@ const Dashboard = () => {
             <div className="text-center space-y-4 max-w-4xl mx-auto mb-16 relative z-10 animate-fade-in">
                 <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/60 backdrop-blur-md border border-white/80 shadow-sm mb-4">
                     <Star size={16} className="text-amber-500 fill-amber-500" />
-                    <span className="text-sm font-bold text-slate-700">بوابة المستقبل التعليمية المطورة</span>
+                    <span className="text-sm font-bold text-slate-700">بوابة التواصل لمستقبلهم</span>
                 </div>
 
-                <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight leading-tight">
+                <h1 className="text-4xl md:text-7xl font-black text-slate-900 tracking-tight leading-tight">
                     نظام <span className="text-gradient">التواصل</span> المدرسي
                 </h1>
 
-                <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto font-medium">
-                    منصة متكاملة لإدارة البيئة المدرسية وتعزيز التواصل الفعال بين المدرسة والمنزل
+                <p className="text-base md:text-xl text-slate-600 max-w-2xl mx-auto font-medium px-2">
+                    منصة متكاملة لتعزيز التواصل الفعال بين المدرسة والأسرة
                 </p>
             </div>
 
-            {/* Search Bar */}
-            <div className="w-full max-w-2xl mx-auto mb-20 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                <form onSubmit={handleSearch} className="relative group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-primary-600 to-indigo-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                    <div className="relative flex bg-white/90 backdrop-blur-md rounded-2xl shadow-premium border border-white/50 p-2 items-center">
-                        <div className="flex items-center flex-1 pr-4">
-                            <Search className="text-slate-400 ml-3" />
-                            <input
-                                type="text"
-                                placeholder="أدخل رقم الهوية أو اسم الطالب للبحث..."
-                                className="w-full p-4 bg-transparent border-none outline-none text-lg text-slate-800 placeholder-slate-400 font-bold"
-                                value={searchId}
-                                onChange={(e) => setSearchId(e.target.value)}
-                            />
-                        </div>
-                        <button type="submit" className="btn btn-primary px-10 py-4 rounded-xl text-lg hover:scale-[1.02]">
-                            <span>بحث</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
+
 
             {/* Feature Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl px-4 relative z-10">
@@ -94,20 +67,20 @@ const Dashboard = () => {
                     <Link
                         key={index}
                         to={card.to}
-                        className="group relative h-[320px] bg-white/70 backdrop-blur-md rounded-[2.5rem] shadow-premium hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden flex flex-col items-center justify-center text-center p-8 border border-white"
+                        className="group relative h-[280px] md:h-[320px] bg-white/70 backdrop-blur-md rounded-[2rem] md:rounded-[2.5rem] shadow-premium hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 overflow-hidden flex flex-col items-center justify-center text-center p-6 md:p-8 border border-white"
                         style={{ animationDelay: `${card.delay}ms` }}
                     >
                         <div className={`absolute top-0 inset-x-0 h-2 bg-gradient-to-r ${card.color}`}></div>
                         <div className={`absolute inset-0 bg-gradient-to-br ${card.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
 
-                        <div className={`w-24 h-24 mb-8 rounded-3xl bg-gradient-to-br ${card.color} flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-500 shadow-xl ${card.shadow}`}>
-                            {card.icon}
+                        <div className={`w-20 h-20 md:w-24 md:h-24 mb-6 md:mb-8 rounded-2xl md:rounded-3xl bg-gradient-to-br ${card.color} flex items-center justify-center transform group-hover:rotate-6 transition-transform duration-500 shadow-xl ${card.shadow}`}>
+                            {React.cloneElement(card.icon as React.ReactElement, { size: 32, className: "md:w-10 md:h-10 text-white" })}
                         </div>
 
-                        <h3 className="text-2xl font-black text-slate-800 mb-3 group-hover:text-primary-700 transition-colors">
+                        <h3 className="text-xl md:text-2xl font-black text-slate-800 mb-2 md:mb-3 group-hover:text-primary-700 transition-colors">
                             {card.title}
                         </h3>
-                        <p className="text-slate-600 font-medium leading-relaxed max-w-xs mx-auto opacity-80 group-hover:opacity-100">
+                        <p className="text-sm md:text-slate-600 font-medium leading-relaxed max-w-xs mx-auto opacity-80 group-hover:opacity-100 px-2">
                             {card.description}
                         </p>
 
