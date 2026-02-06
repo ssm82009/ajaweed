@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Send, Star, User, BookOpen, LogOut, Printer, Users } from 'lucide-react';
+import { Search, Send, Star, User, BookOpen, LogOut, Printer, Users, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const TeacherDashboard = () => {
@@ -31,20 +31,19 @@ const TeacherDashboard = () => {
         } else {
             navigate('/notes');
         }
-    }, []);
+    }, [navigate]);
 
     useEffect(() => {
+        const fetchHistory = async () => {
+            try {
+                const res = await axios.get(`/api/notes/teacher/${user.id}`);
+                setSentNotes(res.data.data);
+            } catch (err) { console.error(err); }
+        };
         if (activeTab === 'history' && user) {
             fetchHistory();
         }
     }, [activeTab, user]);
-
-    const fetchHistory = async () => {
-        try {
-            const res = await axios.get(`/api/notes/teacher/${user.id}`);
-            setSentNotes(res.data.data);
-        } catch (err) { console.error(err); }
-    };
 
     const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -72,7 +71,7 @@ const TeacherDashboard = () => {
             setContent('');
             setIsStar(false);
             setSelectedStudent(null);
-            fetchHistory();
+            // Re-fetch history if needed or just switch back
         } catch (err) {
             alert('فشل الإرسال');
         } finally {
@@ -83,89 +82,89 @@ const TeacherDashboard = () => {
     if (!user) return null;
 
     return (
-        <div className="py-8 animate-fade-in max-w-7xl mx-auto px-4">
-            {/* Top Header Card */}
-            <div className="flex flex-col md:flex-row justify-between items-center mb-8 bg-white/80 backdrop-blur-md p-8 rounded-[2rem] shadow-premium border border-white">
-                <div className="flex items-center gap-5 mb-4 md:mb-0">
-                    <div className="p-4 bg-primary-600 text-white rounded-2xl shadow-lg ring-4 ring-primary-50">
-                        <User size={32} />
+        <div className="py-12 animate-entrance max-w-7xl mx-auto px-6 min-h-screen">
+            {/* Top Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-center mb-16 school-card p-10 bg-white/90 backdrop-blur-xl border-none shadow-[0_32px_64px_-16px_rgba(30,58,138,0.1)]">
+                <div className="flex items-center gap-6 mb-6 md:mb-0">
+                    <div className="w-20 h-20 bg-primary text-white rounded-[2rem] flex items-center justify-center shadow-2xl shadow-primary/30 ring-8 ring-primary/5">
+                        <User size={40} />
                     </div>
-                    <div>
-                        <h1 className="text-3xl font-black text-slate-800">أهلاً بك، {user.name}</h1>
-                        <p className="text-primary-600 font-bold flex items-center gap-1">
-                            <BookOpen size={16} /> معلم مادة: {user.subject}
-                        </p>
+                    <div className="space-y-1">
+                        <h1 className="text-4xl font-black text-slate-800 tracking-tight">أهلاً بك، {user.name}</h1>
+                        <div className="flex items-center gap-3 text-primary font-black text-lg bg-primary/5 px-4 py-1.5 rounded-xl border border-primary/10">
+                            <BookOpen size={20} /> معلم مادة {user.subject}
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => { localStorage.removeItem('user'); navigate('/notes'); }}
-                        className="flex items-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-xl font-black hover:bg-red-100 transition-colors"
+                        className="btn-school-outline border-rose-100 text-rose-500 hover:bg-rose-50 hover:border-rose-200"
                     >
-                        <LogOut size={18} />
-                        تسجيل خروج
+                        <LogOut size={20} />
+                        خروج آمن
                     </button>
                 </div>
             </div>
 
-            {/* Main Navigation Tabs */}
-            <div className="flex gap-4 mb-10 justify-center">
+            {/* Navigation Tabs */}
+            <div className="flex gap-6 mb-12 justify-center">
                 <button
                     onClick={() => setActiveTab('new')}
-                    className={`px-10 py-4 rounded-2xl font-black transition-all flex items-center gap-2 ${activeTab === 'new' ? 'btn-primary shadow-2xl scale-105' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
+                    className={`px-12 py-5 rounded-[2rem] font-black transition-all flex items-center gap-3 shadow-xl ${activeTab === 'new' ? 'btn-school scale-105' : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-100'}`}
                 >
-                    <Send size={20} />
-                    إرسال ملاحظة جديدة
+                    <Send size={24} /> محرر الملاحظات
                 </button>
                 <button
                     onClick={() => setActiveTab('history')}
-                    className={`px-10 py-4 rounded-2xl font-black transition-all flex items-center gap-2 ${activeTab === 'history' ? 'btn-primary shadow-2xl scale-105' : 'bg-white text-slate-500 hover:bg-slate-50 border border-slate-100'}`}
+                    className={`px-12 py-5 rounded-[2rem] font-black transition-all flex items-center gap-3 shadow-xl ${activeTab === 'history' ? 'bg-indigo-600 text-white scale-105' : 'bg-white text-slate-400 hover:bg-slate-50 border border-slate-100'}`}
                 >
-                    <BookOpen size={20} />
-                    سجل المراسلات
+                    <BookOpen size={24} /> سجل الصادر
                 </button>
             </div>
 
             {activeTab === 'new' ? (
-                <div className="grid lg:grid-cols-12 gap-8 items-start">
+                <div className="grid lg:grid-cols-12 gap-10 items-start">
                     {/* Student List Sidebar */}
                     <div className="lg:col-span-4 lg:sticky lg:top-8">
-                        <div className="bg-white/90 backdrop-blur-md p-6 rounded-[2rem] shadow-premium border border-white h-[650px] flex flex-col">
-                            <h3 className="font-black text-xl mb-6 text-slate-800 flex items-center gap-3">
-                                <div className="p-2 bg-blue-50 rounded-lg text-blue-600"><Users size={22} /></div>
-                                البحث عن طالب
-                            </h3>
-                            <form onSubmit={handleSearch} className="space-y-3 mb-6">
-                                <div className="relative">
-                                    <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                        <div className="school-card p-8 bg-white border-none shadow-2xl shadow-primary/5 h-[700px] flex flex-col">
+                            <div className="flex items-center gap-4 mb-8">
+                                <div className="p-3 bg-blue-50 rounded-[1.25rem] text-primary border border-blue-100 shadow-sm"><Users size={28} /></div>
+                                <h3 className="font-black text-2xl text-slate-900 tracking-tight">اختيار الطالب</h3>
+                            </div>
+
+                            <form onSubmit={handleSearch} className="space-y-4 mb-8">
+                                <div className="relative group">
+                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors">
+                                        <Search size={22} />
+                                    </div>
                                     <input
                                         type="text"
-                                        className="w-full pr-12 pl-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 outline-none transition-all font-bold"
-                                        placeholder="الاسم أو رقم الهوية..."
+                                        className="w-full pr-14 pl-4 py-5 bg-slate-50/50 border-2 border-slate-100 rounded-[1.75rem] focus:bg-white focus:border-primary outline-none transition-all font-black text-lg placeholder:text-slate-200"
+                                        placeholder="بحث بالاسم..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
                                 </div>
-                                <button type="submit" className="btn btn-primary w-full py-4 rounded-2xl shadow-lg font-black tracking-wide">بحث سريع</button>
+                                <button type="submit" className="btn-school-outline w-full py-4 rounded-2xl border-primary/20 text-primary hover:bg-primary/5">تحديث القائمة</button>
                             </form>
 
-                            <div className="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
-                                {students.length === 0 && (
-                                    <div className="text-center py-20">
-                                        <div className="text-4xl mb-4 grayscale">🔍</div>
-                                        <p className="text-slate-400 font-bold">ابدأ البحث لعرض الطلاب</p>
+                            <div className="flex-1 overflow-y-auto space-y-4 pr-3 custom-scrollbar">
+                                {students.length === 0 ? (
+                                    <div className="text-center py-24 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100 italic">
+                                        <div className="text-5xl mb-4 opacity-10 font-bold">Search Students</div>
+                                        <p className="text-slate-400 font-bold px-6">استخدم شريط البحث بالأعلى للوصول لبيانات الطلاب</p>
                                     </div>
-                                )}
-                                {students.map(s => (
+                                ) : students.map(s => (
                                     <button
                                         key={s.id}
                                         onClick={() => setSelectedStudent(s)}
-                                        className={`w-full text-right p-5 rounded-2xl transition-all border-2 text-wrap ${selectedStudent?.id === s.id ? 'bg-primary-50 border-primary-500 shadow-lg scale-[1.02]' : 'bg-white border-slate-50 hover:border-slate-200 hover:bg-slate-50'}`}
+                                        className={`w-full text-right p-6 rounded-[1.75rem] transition-all border-2 flex flex-col gap-2 group ${selectedStudent?.id === s.id ? 'bg-primary-50 border-primary shadow-xl shadow-primary/10 scale-[1.02]' : 'bg-white border-slate-50 hover:border-primary/20 hover:bg-slate-50'}`}
                                     >
-                                        <div className="font-black text-slate-800 text-lg mb-1">{s.name}</div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-sm font-bold text-slate-500">{s.grade}</span>
-                                            <span className="text-sm font-black text-primary-600 bg-white px-3 py-1 rounded-lg border border-primary-100">{s.class_name}</span>
+                                        <div className="font-black text-slate-800 text-xl group-hover:text-primary transition-colors">{s.name}</div>
+                                        <div className="flex justify-between items-center opacity-80">
+                                            <span className="text-sm font-bold text-slate-400">{s.grade}</span>
+                                            <span className={`text-[10px] uppercase tracking-widest font-black px-3 py-1 rounded-lg border ${selectedStudent?.id === s.id ? 'bg-white text-primary border-primary/20' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>{s.class_name}</span>
                                         </div>
                                     </button>
                                 ))}
@@ -176,157 +175,181 @@ const TeacherDashboard = () => {
                     {/* Note Sending Form */}
                     <div className="lg:col-span-8">
                         {selectedStudent ? (
-                            <div className="bg-white/90 backdrop-blur-md p-10 rounded-[2.5rem] shadow-premium border border-white h-full">
-                                <div className="flex items-center gap-4 mb-10 pb-6 border-b border-slate-100">
-                                    <div className="w-16 h-16 bg-primary-100 rounded-2xl flex items-center justify-center text-primary-700 font-black text-2xl">
+                            <div className="school-card p-12 bg-white/90 backdrop-blur-xl border-none shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] h-full relative overflow-hidden">
+                                <div className="absolute top-0 inset-x-0 h-3 bg-gradient-to-r from-primary to-secondary"></div>
+
+                                <div className="flex items-center gap-6 mb-12 pb-8 border-b-2 border-slate-50">
+                                    <div className="w-20 h-20 bg-primary/10 rounded-[2rem] flex items-center justify-center text-primary font-black text-3xl shadow-inner border border-primary/5">
                                         {selectedStudent.name.charAt(0)}
                                     </div>
-                                    <div>
-                                        <div className="text-slate-500 font-bold mb-1">توجيه ملاحظة للطالب:</div>
-                                        <div className="text-3xl font-black text-slate-800">{selectedStudent.name}</div>
+                                    <div className="space-y-1">
+                                        <div className="text-slate-400 font-black text-sm uppercase tracking-widest">تحرير رسالة للطالب:</div>
+                                        <div className="text-4xl font-black text-slate-900 tracking-tight">{selectedStudent.name}</div>
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                                    <button onClick={() => { setNoteType('positive'); setIsStar(false); }} className={`p-6 rounded-3xl border-2 font-black transition-all flex flex-col items-center gap-3 ${noteType === 'positive' && !isStar ? 'bg-emerald-50 border-emerald-500 text-emerald-700 shadow-lg scale-105' : 'bg-slate-50 border-transparent text-slate-400 hover:border-slate-200'}`}>
-                                        <span className="text-3xl">👍</span>
-                                        ملاحظة إيجابية
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                                    <button onClick={() => { setNoteType('positive'); setIsStar(false); }} className={`p-8 rounded-[2.5rem] border-4 font-black transition-all flex flex-col items-center gap-4 group ${noteType === 'positive' && !isStar ? 'bg-emerald-50 border-emerald-400 text-emerald-800 shadow-xl shadow-emerald-500/10 scale-105' : 'bg-slate-50/50 border-white text-slate-300 hover:border-slate-200 hover:text-slate-400'}`}>
+                                        <div className="text-5xl group-hover:scale-110 transition-transform">✅</div>
+                                        <span className="text-lg">ملاحظة إيجابية</span>
                                     </button>
-                                    <button onClick={() => { setNoteType('negative'); setIsStar(false); }} className={`p-6 rounded-3xl border-2 font-black transition-all flex flex-col items-center gap-3 ${noteType === 'negative' && !isStar ? 'bg-red-50 border-red-500 text-red-700 shadow-lg scale-105' : 'bg-slate-50 border-transparent text-slate-400 hover:border-slate-200'}`}>
-                                        <span className="text-3xl">📝</span>
-                                        ملاحظة للتطوير
+                                    <button onClick={() => { setNoteType('negative'); setIsStar(false); }} className={`p-8 rounded-[2.5rem] border-4 font-black transition-all flex flex-col items-center gap-4 group ${noteType === 'negative' && !isStar ? 'bg-rose-50 border-rose-400 text-rose-800 shadow-xl shadow-rose-500/10 scale-105' : 'bg-slate-50/50 border-white text-slate-300 hover:border-slate-200 hover:text-slate-400'}`}>
+                                        <div className="text-5xl group-hover:scale-110 transition-transform">⚠️</div>
+                                        <span className="text-lg">ملاحظة للتطوير</span>
                                     </button>
-                                    <button onClick={() => { setIsStar(true); }} className={`p-6 rounded-3xl border-2 font-black transition-all flex flex-col items-center gap-3 ${isStar ? 'bg-amber-50 border-amber-500 text-amber-700 shadow-lg scale-105' : 'bg-slate-50 border-transparent text-slate-400 hover:border-slate-200'}`}>
-                                        <Star className={isStar ? "fill-amber-500 text-amber-500" : ""} size={36} />
-                                        نجمة تميز
+                                    <button onClick={() => { setIsStar(true); }} className={`p-8 rounded-[2.5rem] border-4 font-black transition-all flex flex-col items-center gap-4 group ${isStar ? 'bg-amber-50 border-amber-400 text-amber-800 shadow-xl shadow-amber-500/10 scale-105' : 'bg-slate-50/50 border-white text-slate-300 hover:border-slate-200 hover:text-slate-400'}`}>
+                                        <div className="text-5xl group-hover:scale-110 transition-transform">🌟</div>
+                                        <span className="text-lg">نجمة تميز</span>
                                     </button>
                                 </div>
 
                                 {!isStar ? (
-                                    <div className="relative mb-10 group">
-                                        <div className="absolute -inset-1 bg-gradient-to-r from-primary-200 to-indigo-200 rounded-[2rem] blur opacity-20 group-focus-within:opacity-50 transition-opacity"></div>
+                                    <div className="relative mb-12 group">
+                                        <div className="absolute -inset-2 bg-gradient-to-r from-primary/10 to-transparent rounded-[2.5rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity"></div>
                                         <div className="relative">
                                             <textarea
-                                                className="w-full h-56 p-8 bg-white border-2 border-slate-100 rounded-[2rem] resize-none focus:border-primary-500 focus:ring-0 outline-none text-xl font-bold transition-all shadow-inner"
-                                                placeholder="اكتب تفاصيل الملاحظة بوضوح هنا..."
+                                                className="w-full h-64 p-10 bg-slate-50/50 border-4 border-white rounded-[2.5rem] resize-none focus:bg-white focus:border-primary/20 outline-none text-2xl font-bold transition-all shadow-inner leading-relaxed placeholder:text-slate-200"
+                                                placeholder="صف باختصار سلوك أو إنجاز الطالب هنا..."
                                                 value={content}
                                                 onChange={(e) => setContent(e.target.value)}
                                             ></textarea>
-                                            <div className="absolute bottom-6 left-8 text-slate-400 text-sm font-bold bg-white px-3 py-1 rounded-lg border border-slate-50 shadow-sm">
-                                                {content.length} حرف
+                                            <div className="absolute bottom-8 left-10 text-slate-400 font-black text-sm bg-white/80 px-4 py-2 rounded-xl border border-slate-100 shadow-sm flex items-center gap-2">
+                                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                                                {content.length} حرف تم تدوينه
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="mb-10 py-16 flex items-center justify-center text-center bg-gradient-to-br from-amber-50 to-white rounded-[2rem] border-2 border-dashed border-amber-300 text-amber-900 shadow-inner">
-                                        <div className="animate-bounce-slow">
-                                            <Star size={80} className="mx-auto mb-6 text-amber-400 fill-amber-400 drop-shadow-xl" />
-                                            <p className="font-black text-2xl tracking-tight">سيتم منح الطالب "نجمة تميز" في رصيده العام!</p>
+                                    <div className="mb-12 py-20 bg-amber-50/30 rounded-[3rem] border-4 border-dashed border-amber-200 text-center relative overflow-hidden group">
+                                        <div className="absolute top-0 right-0 w-40 h-40 bg-amber-200/20 blur-3xl -translate-y-1/2 translate-x-1/2 rounded-full"></div>
+                                        <div className="relative animate-entrance">
+                                            <Star size={100} className="mx-auto mb-8 text-amber-500 fill-amber-500 drop-shadow-[0_10px_10px_rgba(245,158,11,0.3)] group-hover:rotate-12 transition-transform duration-700" />
+                                            <h4 className="text-3xl font-black text-amber-900 mb-2 tracking-tight">منح وسام التميز</h4>
+                                            <p className="text-amber-700/70 font-bold text-xl px-12 leading-relaxed">سيتم توثيق هذه النجمة في ملف الطالب الرسمي المتاح لولي الأمر</p>
                                         </div>
                                     </div>
                                 )}
 
-                                <div className="flex items-center justify-between">
-                                    <div className="text-slate-500 text-sm font-bold bg-slate-100 px-6 py-3 rounded-2xl flex items-center gap-2">
-                                        <BookOpen size={18} /> مادة {user.subject}
+                                <div className="flex items-center justify-between gap-6 pt-10 border-t-2 border-slate-50">
+                                    <div className="hidden md:flex items-center gap-4 text-slate-400 font-bold text-lg bg-slate-50 px-8 py-4 rounded-2xl border border-slate-100 italic">
+                                        <BookOpen size={24} className="opacity-40" /> رصد إداري لمادة: {user.subject}
                                     </div>
                                     <button
                                         onClick={handleSend}
                                         disabled={sending || (!content && !isStar)}
-                                        className="btn btn-primary px-12 py-5 rounded-[1.5rem] shadow-2xl text-xl font-black gap-3 hover:scale-105 active:scale-95"
+                                        className="btn-school flex-1 md:flex-none px-16 py-6 text-2xl shadow-3xl shadow-primary/30 group active:scale-95"
                                     >
-                                        {sending ? 'جاري الإرسال...' : (
-                                            <>
-                                                <Send size={24} /> إرسال الآن
-                                            </>
+                                        {sending ? (
+                                            <div className="flex items-center gap-4">
+                                                <div className="animate-spin rounded-full h-6 w-6 border-4 border-white border-t-transparent shadow-md"></div>
+                                                جاري الأرشفة...
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-4">
+                                                <Send size={28} className="group-hover:-translate-y-1 group-hover:translate-x-1 transition-transform" />
+                                                اعتماد الإرسال
+                                            </div>
                                         )}
                                     </button>
                                 </div>
                             </div>
                         ) : (
-                            <div className="h-[750px] flex flex-col items-center justify-center text-slate-300 border-4 border-dashed border-slate-100 rounded-[3rem] bg-white/50 backdrop-blur-sm">
-                                <div className="p-8 bg-slate-50 rounded-full mb-6">
-                                    <User size={80} className="opacity-30" />
+                            <div className="h-[750px] flex flex-col items-center justify-center text-slate-300 border-4 border-dashed border-slate-100 rounded-[3.5rem] bg-white/30 backdrop-blur-sm group hover:border-primary/20 transition-colors">
+                                <div className="p-12 bg-white rounded-[3rem] shadow-xl border border-slate-50 mb-8 transform group-hover:scale-110 transition-transform duration-700">
+                                    <Users size={100} className="text-slate-100" />
                                 </div>
-                                <p className="text-2xl font-black text-slate-400">اختر طالباً من القائمة للبدء في كتابة الملاحظة</p>
+                                <h3 className="text-3xl font-black text-slate-400 tracking-tight">حدد أحد الطلاب للمتابعة</h3>
+                                <p className="text-slate-300 font-bold mt-4 text-lg">يمكنك استخدام القائمة الجانبية للبحث عن طالب محدد بالاسم</p>
                             </div>
                         )}
                     </div>
                 </div>
             ) : (
                 /* History Tab View */
-                <div className="animate-fade-in bg-white/90 backdrop-blur-md rounded-[3rem] shadow-premium border border-white p-10 min-h-[600px]">
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
-                        <div>
-                            <h2 className="text-4xl font-black text-slate-800 mb-2">سجل المراسلات</h2>
-                            <p className="text-slate-500 text-lg font-bold">جميع الملاحظات التي قمت بإرسالها للطلاب</p>
+                <div className="animate-entrance bg-white/90 backdrop-blur-2xl rounded-[3.5rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.08)] border-none p-12 min-h-[600px] relative overflow-hidden">
+                    <div className="absolute top-0 inset-x-0 h-2 bg-gradient-to-r from-indigo-500 to-blue-500"></div>
+
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10 mb-16 pb-12 border-b-2 border-slate-50">
+                        <div className="space-y-3">
+                            <h2 className="text-5xl font-black text-slate-900 tracking-tight">سجل الصادر التعليمي</h2>
+                            <p className="text-slate-400 text-xl font-bold">الأرشيف الكامل لكافة الملاحظات والنجوم التي تم منحها للطلاب</p>
                         </div>
-                        <div className="bg-primary-600 text-white px-8 py-3 rounded-2xl font-black shadow-lg shadow-primary-500/30 text-xl">
-                            {sentNotes.length} ملاحظة
+                        <div className="bg-indigo-600 text-white px-10 py-6 rounded-[2rem] font-black shadow-3xl shadow-indigo-600/30 text-3xl border-4 border-indigo-400/30">
+                            {sentNotes.length} <span className="text-sm opacity-80 uppercase tracking-widest mr-2">إجمالي المراسلات</span>
                         </div>
                     </div>
 
                     {sentNotes.length === 0 ? (
-                        <div className="text-center py-20 bg-slate-50 rounded-[2rem] border-2 border-dashed border-slate-200">
-                            <div className="text-6xl mb-4">📭</div>
-                            <p className="text-slate-400 text-xl font-black">لا يوجد مراسلات مسجلة في حسابك حتى الآن</p>
+                        <div className="text-center py-40 bg-slate-50/50 rounded-[3rem] border-4 border-dashed border-slate-100">
+                            <div className="w-32 h-32 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 shadow-2xl border border-slate-100 opacity-20">
+                                <BookOpen size={64} />
+                            </div>
+                            <p className="text-slate-400 text-2xl font-black">لا يوجد أرشيف مراسلات حالياً</p>
                         </div>
                     ) : (
-                        <div className="space-y-10">
+                        <div className="space-y-12 pr-4 custom-scrollbar">
                             {Object.entries(sentNotes.reduce((acc: any, note) => {
                                 if (!acc[note.student_name]) acc[note.student_name] = [];
                                 acc[note.student_name].push(note);
                                 return acc;
                             }, {})).map(([studentName, notes]: [string, any]) => (
-                                <div key={studentName} className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-                                    <div className="bg-slate-50 px-8 py-5 border-b border-slate-100 flex justify-between items-center flex-wrap gap-4">
-                                        <div className="flex items-center gap-4">
-                                            <div className="w-10 h-10 bg-primary-600 rounded-xl flex items-center justify-center text-white font-black text-lg">
+                                <div key={studentName} className="school-card p-0 bg-white border-none shadow-2xl shadow-indigo-500/5 group/card overflow-hidden">
+                                    <div className="bg-slate-50 px-10 py-8 flex justify-between items-center flex-wrap gap-8 border-b border-slate-100">
+                                        <div className="flex items-center gap-6">
+                                            <div className="w-16 h-16 bg-indigo-600 rounded-[1.25rem] flex items-center justify-center text-white font-black text-3xl shadow-xl shadow-indigo-600/20 group-hover/card:scale-110 transition-transform">
                                                 {studentName.charAt(0)}
                                             </div>
-                                            <span className="text-2xl font-black text-slate-800">{studentName}</span>
-                                            <span className="bg-white border text-primary-600 px-3 py-1 rounded-lg text-sm font-black">{notes.length} ملاحظات</span>
+                                            <div className="space-y-1">
+                                                <span className="text-3xl font-black text-slate-900 tracking-tight">{studentName}</span>
+                                                <div className="text-sm font-bold text-slate-400 px-4 py-1 bg-white border rounded-full text-center">أرشيف يضم {notes.length} سجلات</div>
+                                            </div>
                                         </div>
                                         <button onClick={() => {
                                             const printContent = document.getElementById(`print-${studentName}`)?.innerHTML;
                                             const win = window.open('', '', 'height=700,width=900');
-                                            win?.document.write(`<html><head><title>تقرير الطالب ${studentName}</title><style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap'); body { font-family: 'Cairo', sans-serif; direction: rtl; padding: 40px; } .no-print { display: none; } table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { border: 1px solid #ddd; padding: 12px; text-align: right; } th { background-color: #f8fafc; color: #1e293b; font-weight: bold; } h1 { color: #4f46e5; text-align: center; margin-bottom: 20px; } .student-info { margin-bottom: 30px; font-weight: bold; border-right: 4px solid #4f46e5; padding-right: 15px; }</style></head><body><h1>تقرير ملاحظات المعلمين</h1><div class="student-info">الطالب: ${studentName}<br>المعلم: ${user.name}</div>${printContent}</body></html>`);
+                                            win?.document.write(`<html><head><title>تقرير الطالب ${studentName}</title><style>@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap'); body { font-family: 'Cairo', sans-serif; direction: rtl; padding: 40px; } .no-print { display: none; } table { width: 100%; border-collapse: collapse; margin-top: 20px; } th, td { border: 1px solid #ddd; padding: 15px; text-align: right; } th { background-color: #f8fafc; color: #1e293b; font-weight: 900; } h1 { color: #1e3a8a; text-align: center; margin-bottom: 20px; font-weight: 900; } .student-info { margin-bottom: 30px; font-weight: bold; border-right: 4px solid #1e3a8a; padding-right: 15px; }</style></head><body><h1>تقرير المتابعة اليومية للأجاويد</h1><div class="student-info">اسم الطالب: ${studentName}<br>المعلم المصدر: ${user.name} | مادة: ${user.subject}</div>${printContent}</body></html>`);
                                             win?.document.close();
                                             win?.print();
-                                        }} className="flex items-center gap-2 px-6 py-3 bg-white text-slate-700 rounded-xl font-bold border border-slate-200 hover:bg-slate-50 hover:border-slate-300 transition-all">
-                                            <Printer size={18} /> طباعة التقرير
+                                        }} className="btn-school-outline border-slate-200 text-slate-600 bg-white hover:bg-slate-50 px-10 py-5 rounded-2xl shadow-sm">
+                                            <Printer size={20} /> تصدير التقرير PDF
                                         </button>
                                     </div>
-                                    <div id={`print-${studentName}`} className="p-0 overflow-x-auto">
+                                    <div id={`print-${studentName}`} className="overflow-x-auto">
                                         <table className="w-full text-right border-collapse">
-                                            <thead className="bg-slate-50/50 text-slate-500 font-bold border-b border-slate-100">
+                                            <thead className="bg-slate-50/30 text-slate-400 font-black text-sm uppercase tracking-widest border-b border-slate-50 h-20">
                                                 <tr>
-                                                    <th className="p-6">النوع</th>
-                                                    <th className="p-6">المحتوى</th>
-                                                    <th className="p-6">التاريخ</th>
-                                                    <th className="p-6 no-print">الحالة</th>
+                                                    <th className="px-10">تصنيف الملاحظة</th>
+                                                    <th className="px-10">محتوى الإرسال</th>
+                                                    <th className="px-10">وقت الرصد</th>
+                                                    <th className="px-10 no-print">الحالة</th>
                                                 </tr>
                                             </thead>
-                                            <tbody className="divide-y divide-slate-50">
+                                            <tbody className="divide-y-2 divide-slate-50">
                                                 {notes.map((note: any) => (
-                                                    <tr key={note.id} className="hover:bg-slate-50/30 transition-colors">
-                                                        <td className="p-6">
-                                                            <span className={`px-4 py-1.5 rounded-full text-xs font-black inline-flex items-center gap-1.5
-                                                            ${note.type === 'star' ? 'bg-amber-100 text-amber-700' :
-                                                                    note.sentiment === 'positive' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                                                    <tr key={note.id} className="hover:bg-indigo-50/30 transition-all h-24 group/row">
+                                                        <td className="px-10">
+                                                            <span className={`px-5 py-2 rounded-2xl text-[10px] font-black inline-flex items-center gap-2 border shadow-sm
+                                                            ${note.type === 'star' ? 'bg-amber-50 text-amber-700 border-amber-100' :
+                                                                    note.sentiment === 'positive' ? 'bg-emerald-50 text-emerald-800 border-emerald-100' : 'bg-rose-50 text-rose-800 border-rose-100'}`}>
+                                                                <div className={`w-1.5 h-1.5 rounded-full ${note.type === 'star' ? 'bg-amber-500' : note.sentiment === 'positive' ? 'bg-emerald-500' : 'bg-rose-500'}`}></div>
                                                                 {note.type === 'star' ? '🌟 نجمة تميز' : note.sentiment === 'positive' ? '✅ إيجابية' : '⚠️ للتطوير'}
                                                             </span>
                                                         </td>
-                                                        <td className="p-6 text-slate-700 font-bold leading-relaxed">{note.content}</td>
-                                                        <td className="p-6 text-sm text-slate-400 font-medium">{new Date(note.created_at).toLocaleDateString('ar-SA')}</td>
-                                                        <td className="p-6 no-print">
+                                                        <td className="px-10 text-slate-700 font-bold text-lg leading-relaxed max-w-lg group-hover/row:text-slate-900 transition-colors">{note.content}</td>
+                                                        <td className="px-10 text-sm text-slate-400 font-black">
+                                                            <div className="flex items-center gap-2">
+                                                                <Calendar size={16} className="opacity-40" />
+                                                                {new Date(note.created_at).toLocaleDateString('ar-SA')}
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-10 no-print">
                                                             {note.is_read ? (
-                                                                <span className="text-emerald-600 font-black text-xs bg-emerald-50 px-3 py-1.5 rounded-lg flex items-center gap-1 w-fit">
-                                                                    <Send size={12} /> مقروءة
+                                                                <span className="text-emerald-500 font-black text-[10px] bg-emerald-50 px-4 py-2 rounded-xl flex items-center justify-center gap-2 border border-emerald-100 shadow-sm">
+                                                                    <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div> تمت قراءتها
                                                                 </span>
                                                             ) : (
-                                                                <span className="text-slate-400 font-black text-xs bg-slate-50 px-3 py-1.5 rounded-lg flex items-center gap-1 w-fit">
-                                                                    <Send size={12} className="opacity-50" /> مرسلة
+                                                                <span className="text-slate-300 font-black text-[10px] bg-slate-50 px-4 py-2 rounded-xl flex items-center justify-center gap-2 border border-slate-100">
+                                                                    في الانتظار
                                                                 </span>
                                                             )}
                                                         </td>

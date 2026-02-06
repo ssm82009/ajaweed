@@ -38,52 +38,76 @@ export default function Login() {
     };
 
     return (
-        <div className="flex-center" style={{ minHeight: '100vh', position: 'relative' }}>
-            {/* Header Settings Display */}
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, padding: '2rem', textAlign: 'center', fontSize: '0.9rem', lineHeight: '1.6', color: '#4b5563', zIndex: 10 }}>
-                {headerSettings.header_line1 && <div>{headerSettings.header_line1}</div>}
-                {headerSettings.header_line2 && <div>{headerSettings.header_line2}</div>}
-                {headerSettings.header_line3 && <div>{headerSettings.header_line3}</div>}
-                {headerSettings.header_line4 && <div style={{ fontWeight: 'bold', marginTop: '0.25rem' }}>{headerSettings.header_line4}</div>}
+        <div className="flex-center min-h-screen relative bg-slate-50 px-6">
+            {/* Official Header Settings */}
+            <div className="absolute top-0 left-0 right-0 py-8 px-6 text-center text-sm font-bold text-slate-500 leading-relaxed border-b border-slate-100 bg-white/50 backdrop-blur-md z-10">
+                <div className="max-w-4xl mx-auto">
+                    {headerSettings.header_line1 && <div className="uppercase tracking-widest text-[10px] mb-1">{headerSettings.header_line1}</div>}
+                    {headerSettings.header_line2 && <div className="text-primary font-black">{headerSettings.header_line2}</div>}
+                    {headerSettings.header_line3 && <div>{headerSettings.header_line3}</div>}
+                    {headerSettings.header_line4 && <div className="mt-2 text-slate-800 text-lg font-black">{headerSettings.header_line4}</div>}
+                </div>
             </div>
 
-            <div className="glass-panel animate-fade-in" style={{ width: '100%', maxWidth: '400px' }}>
-                <h2 style={{ textAlign: 'center', marginBottom: '2rem' }}>تسجيل الدخول</h2>
+            <div className="glass-panel animate-fade-in w-full max-w-md bg-white border border-slate-100 shadow-2xl shadow-primary/5 p-12">
+                <div className="text-center mb-10">
+                    <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-blue-100 shadow-inner">
+                        <Lock size={36} className="text-primary" />
+                    </div>
+                    <h2 className="text-3xl font-black text-slate-900">تسجيل الدخول</h2>
+                    <p className="text-slate-400 font-bold mt-2">نظام إدارة الخروج والزيارات</p>
+                </div>
 
-                <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    <div style={{ position: 'relative' }}>
-                        <User size={20} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: '#6b7280' }} />
+                <form onSubmit={handleLogin} className="flex flex-col gap-6">
+                    <div className="relative group">
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors">
+                            <User size={24} />
+                        </div>
                         <input
                             type="text"
                             placeholder="اسم المستخدم"
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            style={{ paddingRight: '40px' }}
+                            className="pr-14 py-4 text-lg font-bold"
                         />
                     </div>
 
-                    <div style={{ position: 'relative' }}>
-                        <Lock size={20} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', color: '#6b7280' }} />
+                    <div className="relative group">
+                        <div className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors">
+                            <Lock size={24} />
+                        </div>
                         <input
                             type="password"
                             placeholder="كلمة المرور"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            style={{ paddingRight: '40px' }}
+                            className="pr-14 py-4 text-lg font-bold"
                         />
                     </div>
 
-                    {error && <p style={{ color: 'var(--danger)', fontSize: '0.9rem', textAlign: 'center' }}>{error}</p>}
+                    {error && (
+                        <div className="bg-rose-50 border border-rose-100 text-rose-600 p-4 rounded-2xl text-center font-black text-sm animate-shake">
+                            {error}
+                        </div>
+                    )}
 
-                    <button type="submit" className="btn btn-primary">
-                        دخول
+                    <button type="submit" className="btn btn-primary py-4 text-xl shadow-xl shadow-primary/20">
+                        دخول النظام
+                    </button>
+
+                    <button type="button" onClick={() => navigate('/')} className="text-sm font-bold text-slate-400 hover:text-primary transition-colors mt-2">
+                        ← العودة للرئيسية
                     </button>
                 </form>
             </div>
 
-            {/* Footer Copyright */}
-            <div style={{ position: 'absolute', bottom: '10px', left: 0, right: 0, textAlign: 'center', fontSize: '0.75rem', color: '#9ca3af' }}>
-                حقوق الملكية الفكرية والبرمجية محفوظة لـ ماجد عثمان الزهراني
+            {/* Premium Footer */}
+            <div className="absolute bottom-6 left-0 right-0 text-center">
+                <div className="inline-flex items-center gap-4 bg-white/50 backdrop-blur-sm px-6 py-2 rounded-full border border-slate-100 shadow-sm">
+                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">نظام الأجاويد v4.0.0</span>
+                    <span className="w-1 h-1 bg-slate-200 rounded-full"></span>
+                    <span className="text-[10px] font-bold text-slate-400">© 2026 م. ماجد عثمان الزهراني</span>
+                </div>
             </div>
         </div>
     );

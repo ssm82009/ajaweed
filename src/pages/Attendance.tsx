@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { Lock, Settings } from 'lucide-react';
+import { Lock, Settings, ChevronRight, GraduationCap, ClipboardList } from 'lucide-react';
 
 const Attendance = () => {
     const [view, setView] = useState<'search' | 'admin'>('search');
@@ -86,20 +86,25 @@ const Attendance = () => {
     if (view === 'admin') {
         if (!isAuthenticated) {
             return (
-                <div className="py-20 flex justify-center animate-fade-in">
-                    <div className="card p-8 w-full max-w-sm text-center">
-                        <Lock className="mx-auto mb-4 text-primary" size={40} />
-                        <h2 className="text-xl font-bold mb-6">الدخول للوحة التحكم</h2>
-                        <form onSubmit={handleLogin} className="space-y-4">
-                            <input
-                                type="password"
-                                className="w-full p-3 border rounded text-center"
-                                placeholder="كلمة المرور"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <button className="btn btn-primary w-full">دخول</button>
-                            <button type="button" onClick={() => setView('search')} className="text-sm text-gray-500">عودة للبحث</button>
+                <div className="py-24 flex justify-center animate-entrance">
+                    <div className="school-card p-12 w-full max-w-md text-center">
+                        <div className="w-20 h-20 bg-blue-50 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-blue-100">
+                            <Lock className="text-primary" size={40} />
+                        </div>
+                        <h2 className="text-3xl font-black mb-8">الدخول للوحة التحكم</h2>
+                        <form onSubmit={handleLogin} className="space-y-6 text-right">
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mr-2">كلمة المرور الإدارية</label>
+                                <input
+                                    type="password"
+                                    className="text-center text-2xl font-black tracking-widest"
+                                    placeholder="••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
+                            </div>
+                            <button className="btn-school w-full py-4 text-xl">دخول النظام</button>
+                            <button type="button" onClick={() => setView('search')} className="block w-full text-center text-sm font-bold text-slate-400 hover:text-primary transition-colors">عودة للبحث</button>
                         </form>
                     </div>
                 </div>
@@ -107,61 +112,75 @@ const Attendance = () => {
         }
 
         return (
-            <div className="py-10 max-w-4xl mx-auto animate-fade-in">
-                <div className="flex justify-between items-center mb-8">
-                    <h2 className="text-2xl font-bold flex items-center gap-2">
-                        <Settings className="text-primary" /> لوحة تحكم الحضور
+            <div className="py-16 max-w-5xl mx-auto animate-entrance px-4">
+                <div className="flex justify-between items-center mb-12">
+                    <h2 className="text-4xl font-black flex items-center gap-4">
+                        <div className="p-3 bg-blue-50 rounded-2xl border border-blue-100"><Settings className="text-primary" size={28} /></div>
+                        لوحة تحكم الحضور
                     </h2>
-                    <button onClick={() => { setIsAuthenticated(false); setView('search'); }} className="text-red-500">خروج</button>
+                    <button onClick={() => { setIsAuthenticated(false); setView('search'); }} className="btn-school-outline border-red-100 text-red-500 hover:bg-red-50 hover:border-red-200">خروج آمن</button>
                 </div>
 
-                <div className="flex gap-4 mb-6">
-                    <button onClick={() => setTab('upload')} className={`px-4 py-2 rounded ${tab === 'upload' ? 'bg-primary text-white' : 'bg-gray-100'}`}>رفع السجلات</button>
-                    <button onClick={() => setTab('settings')} className={`px-4 py-2 rounded ${tab === 'settings' ? 'bg-primary text-white' : 'bg-gray-100'}`}>الإعدادات</button>
+                <div className="flex gap-4 mb-10">
+                    <button onClick={() => setTab('upload')} className={`px-8 py-3 rounded-2xl font-black transition-all ${tab === 'upload' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'bg-white text-slate-500 border border-slate-100 hover:bg-slate-50'}`}>رفع السجلات</button>
+                    <button onClick={() => setTab('settings')} className={`px-8 py-3 rounded-2xl font-black transition-all ${tab === 'settings' ? 'bg-primary text-white shadow-xl shadow-primary/20' : 'bg-white text-slate-500 border border-slate-100 hover:bg-slate-50'}`}>الإعدادات العامة</button>
                 </div>
 
-                <div className="card p-8">
+                <div className="school-card p-12">
                     {tab === 'upload' ? (
-                        <div className="space-y-6">
-                            <h3 className="font-bold text-lg">استيراد ملف الحضور (Excel)</h3>
-                            <div className="bg-yellow-50 p-4 rounded text-sm text-yellow-800">
+                        <div className="space-y-8">
+                            <h3 className="font-black text-2xl">استيراد ملف الحضور (Excel)</h3>
+                            <div className="bg-blue-50/50 p-6 rounded-[1.5rem] border border-blue-100 text-sm font-bold text-blue-800 leading-relaxed">
+                                <span className="block mb-2 text-primary">⚠️ ملاحظات هامة:</span>
                                 يجب أن يحتوي الملف على الأعمدة بالترتيب: (اسم الطالب)، (الصف)، (الفصل)، (رقم الهوية)، (التاريخ)، (وقت الوصول) <br />
                                 سيتم احتساب الغياب تلقائياً للطلاب غير الموجودين في الملف لتواريخ الملف.
                             </div>
-                            <div className="border-2 border-dashed border-gray-300 p-10 rounded text-center">
-                                <input type="file" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
+
+                            <div className="relative group">
+                                <label className="flex flex-col items-center justify-center w-full h-48 border-4 border-dashed border-slate-100 rounded-[2rem] bg-slate-50/50 hover:bg-white hover:border-blue-200 transition-all cursor-pointer">
+                                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                                        <div className="p-4 bg-white rounded-2xl shadow-sm mb-4 border border-slate-100 group-hover:scale-110 transition-transform">
+                                            <Settings className="text-slate-400 group-hover:text-primary" size={32} />
+                                        </div>
+                                        <p className="mb-2 text-sm text-slate-500 font-bold tracking-tight">
+                                            {file ? <span className="text-primary">{file.name}</span> : <span>اضغط هنا لاختيار ملف Excel</span>}
+                                        </p>
+                                        <p className="text-xs text-slate-400 font-medium">XLSX, XLS (الحد الأقصى 10MB)</p>
+                                    </div>
+                                    <input type="file" className="hidden" onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)} />
+                                </label>
                             </div>
 
-                            <div>
-                                <label className="block font-bold mb-2">تاريخ التحضير</label>
-                                <input
-                                    type="date"
-                                    value={uploadDate}
-                                    onChange={(e) => setUploadDate(e.target.value)}
-                                    className="w-full p-2 border rounded"
-                                    required
-                                />
-                                <p className="text-xs text-gray-500 mt-1">سيتم تعميم هذا التاريخ على جميع سجلات الملف (أفضل لتفادي أخطاء التواريخ في الملف)</p>
+                            <div className="grid md:grid-cols-2 gap-8 items-end">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest mr-2">تاريخ التحضير</label>
+                                    <input
+                                        type="date"
+                                        value={uploadDate}
+                                        onChange={(e) => setUploadDate(e.target.value)}
+                                        className="font-bold text-lg"
+                                        required
+                                    />
+                                </div>
+                                <button onClick={handleUpload} disabled={!file || uploading} className="btn-school h-[3.5rem] text-lg">
+                                    {uploading ? 'جاري المعالجة...' : 'بدء عملية الاستيراد'}
+                                </button>
                             </div>
-
-                            {uploadMsg && <p className="text-center font-bold text-green-600">{uploadMsg}</p>}
-                            <button onClick={handleUpload} disabled={!file || uploading} className="btn btn-primary w-full">
-                                {uploading ? 'جاري المعالجة...' : 'بدء الاستيراد'}
-                            </button>
+                            {uploadMsg && <div className={`text-center p-4 rounded-xl font-black ${uploadMsg.includes('نجاح') ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>{uploadMsg}</div>}
                         </div>
                     ) : (
-                        <div className="space-y-6 max-w-md mx-auto">
-                            <div>
-                                <label className="block font-bold mb-2">وقت الحضور المتأخر</label>
-                                <input type="time" value={threshold} onChange={(e) => setThreshold(e.target.value)} className="w-full p-2 border rounded" />
-                                <p className="text-xs text-gray-500 mt-1">أي حضور بعد هذا الوقت سيعتبر متأخراً (لون برتقالي)</p>
+                        <div className="space-y-8 max-w-2xl mx-auto py-8">
+                            <div className="grid md:grid-cols-2 gap-8">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest mr-2">وقت الحضور المتأخر</label>
+                                    <input type="time" value={threshold} onChange={(e) => setThreshold(e.target.value)} className="font-bold text-lg" />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest mr-2">تغيير كلمة المرور</label>
+                                    <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="••••••" className="text-center font-bold text-lg" />
+                                </div>
                             </div>
-                            <hr />
-                            <div>
-                                <label className="block font-bold mb-2">تغيير كلمة المرور</label>
-                                <input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="w-full p-2 border rounded" placeholder="كلمة المرور الجديدة" />
-                            </div>
-                            <button onClick={handleSettingsSave} className="btn btn-primary w-full">حفظ التغييرات</button>
+                            <button onClick={handleSettingsSave} className="btn-school w-full py-4 text-xl">حفظ كافة التغييرات</button>
                         </div>
                     )}
                 </div>
@@ -170,129 +189,177 @@ const Attendance = () => {
     }
 
     return (
-        <div className="py-12 animate-fade-in max-w-4xl mx-auto min-h-screen">
+        <div className="py-16 animate-entrance max-w-5xl mx-auto min-h-screen px-4">
 
-            <div className="text-center mb-10">
-                <h1 className="text-3xl font-bold text-text mb-4">سجلات الحضور والغياب</h1>
-                <p className="text-text-light">استعلم عن حالة الانضباط والنقاط المكتسبة</p>
+            <div className="text-center mb-16 space-y-4">
+                <h1 className="text-5xl md:text-7xl font-black tracking-tight"><span className="text-royal">سجلات</span> الانضباط المدرسية</h1>
+                <p className="text-xl text-slate-500 font-bold opacity-80">استعلم عن حالة الحضور والغياب والنقاط المكتسبة للطلاب</p>
             </div>
 
-            {/* Search Box */}
-            {/* Search Box */}
-            <div className="card p-8 mb-10 border-t-8 border-primary shadow-xl">
-                <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+            {/* Premium Search Box */}
+            <div className="school-card p-10 mb-12 border-t-[12px] border-primary shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+                <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-6 relative z-10">
                     <input
                         type="text"
-                        className="flex-1 p-4 border-2 border-gray-200 rounded-xl text-right text-xl focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all"
+                        className="flex-1 p-6 border-slate-100 bg-slate-50 rounded-3xl text-right text-3xl font-black focus:bg-white placeholder:text-slate-300 transition-all tracking-widest"
                         placeholder="أدخل رقم الهوية للاستعلام..."
                         value={nid}
                         onChange={(e) => setNid(e.target.value)}
                     />
-                    <button type="submit" className="btn btn-primary px-10 py-4 text-xl rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all">
-                        بحث
+                    <button type="submit" className="btn-school px-12 text-2xl shadow-2xl group">
+                        بحث الآن <ChevronRight size={24} className="group-hover:-translate-x-2 transition-transform" />
                     </button>
                 </form>
+
                 {/* Gamification Banner */}
-                <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                    <div className="bg-green-50 p-4 rounded-2xl border-2 border-green-100 text-green-800 hover:scale-105 transition-transform">
-                        <span className="block font-black text-3xl mb-2 text-green-600">+3</span>
-                        <span className="font-bold text-lg">نقاط حضور مبكر</span>
+                <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 text-center pt-10 border-t border-slate-50">
+                    <div className="group space-y-3">
+                        <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform font-black text-2xl shadow-sm border border-emerald-200">
+                            +3
+                        </div>
+                        <span className="font-black text-slate-700 block text-lg">نقاط حضور مبكر</span>
+                        <p className="text-xs text-slate-400 font-bold px-4 leading-relaxed">للمبادرين بالحضور قبل الوقت المحدد</p>
                     </div>
-                    <div className="bg-orange-50 p-4 rounded-2xl border-2 border-orange-100 text-orange-800 hover:scale-105 transition-transform">
-                        <span className="block font-black text-3xl mb-2 text-orange-500">+1</span>
-                        <span className="font-bold text-lg">نقطة تأخر صباحي</span>
+                    <div className="group space-y-3">
+                        <div className="w-16 h-16 bg-amber-100 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform font-black text-2xl shadow-sm border border-amber-200">
+                            +1
+                        </div>
+                        <span className="font-black text-slate-700 block text-lg">نقطة تأخر صباحي</span>
+                        <p className="text-xs text-slate-400 font-bold px-4 leading-relaxed">نقدر حضوركم حتى لو كان متأخراً</p>
                     </div>
-                    <div className="bg-red-50 p-4 rounded-2xl border-2 border-red-100 text-red-800 hover:scale-105 transition-transform">
-                        <span className="block font-black text-3xl mb-2 text-red-600">-1</span>
-                        <span className="font-bold text-lg">نقطة غياب</span>
+                    <div className="group space-y-3">
+                        <div className="w-16 h-16 bg-rose-100 text-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform font-black text-2xl shadow-sm border border-rose-200">
+                            -1
+                        </div>
+                        <span className="font-black text-slate-700 block text-lg">نقطة غياب</span>
+                        <p className="text-xs text-slate-400 font-bold px-4 leading-relaxed">نأمل الالتزام لضمان عدم نقص النقاط</p>
                     </div>
                 </div>
             </div>
 
-            {loading && <div className="text-center py-10"><div className="animate-spin inline-block w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div></div>}
-            {errorSearch && <div className="text-center text-red-500 font-bold py-10 card bg-red-50 border-red-100">{errorSearch}</div>}
+            {loading && (
+                <div className="flex flex-col items-center justify-center py-20 animate-pulse">
+                    <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <span className="font-black text-slate-400 text-sm tracking-widest uppercase">جاري استرجاع البيانات...</span>
+                </div>
+            )}
+
+            {errorSearch && (
+                <div className="school-card bg-rose-50 border-rose-100 flex items-center justify-center gap-4 py-16 animate-entrance">
+                    <div className="p-4 bg-white rounded-2xl shadow-sm"><Lock className="text-rose-500" size={32} /></div>
+                    <div className="text-right">
+                        <h3 className="text-2xl font-black text-rose-700 mb-1">{errorSearch}</h3>
+                        <p className="text-rose-600/60 font-bold">تأكد من صحة رقم الهوية المدخل وحاول مرة أخرى</p>
+                    </div>
+                </div>
+            )}
 
             {studentData && (
-                <div className="space-y-6 animate-fade-in text-right">
+                <div className="space-y-10 animate-entrance text-right">
 
-                    {/* Student Header */}
-                    <div className="card p-8 bg-gradient-to-br from-white to-blue-50 border-r-4 border-primary shadow-xl">
-                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div>
-                                <h2 className="text-3xl font-black text-primary mb-2">{studentData.student.name}</h2>
-                                <p className="text-xl text-gray-600 font-medium mb-1">{studentData.student.grade} - {studentData.student.class_name}</p>
-                                <p className="text-sm text-gray-500 font-bold mt-2">
-                                    آخر تحضير: <span className="text-primary-dark">{studentData.records.length > 0 ? `${studentData.records[0].date} | ${studentData.records[0].time}` : 'لا يوجد'}</span>
-                                </p>
+                    {/* Student Status Card */}
+                    <div className="school-card p-12 bg-gradient-to-br from-white to-blue-50/30 border-r-8 border-primary relative overflow-hidden">
+                        <div className="absolute top-0 left-0 p-12 opacity-5 -z-0">
+                            <GraduationCap size={180} className="text-primary" />
+                        </div>
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-10 relative z-10">
+                            <div className="space-y-4 text-center md:text-right">
+                                <span className="badge badge-info px-4 py-1.5 text-sm mb-2">الملف الشخصي للطالب</span>
+                                <h2 className="text-4xl md:text-5xl font-black tracking-tight">{studentData.student.name}</h2>
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                                    <span className="px-5 py-2 bg-white rounded-2xl border border-slate-100 font-bold text-slate-600 shadow-sm">{studentData.student.grade}</span>
+                                    <span className="px-5 py-2 bg-white rounded-2xl border border-slate-100 font-bold text-slate-600 shadow-sm">{studentData.student.class_name}</span>
+                                </div>
+                                <div className="flex items-center justify-center md:justify-start gap-2 text-slate-400 font-bold text-sm mt-4">
+                                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                                    آخر تحضير: <span className="text-slate-800">{studentData.records.length > 0 ? `${studentData.records[0].date} | ${studentData.records[0].time}` : 'لم يتم التحضير بعد'}</span>
+                                </div>
                             </div>
-                            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center min-w-[150px]">
-                                <span className="text-4xl font-black text-primary mb-1">{studentData.stats.totalPoints}</span>
-                                <span className="text-sm font-bold text-gray-400">مجموع النقاط</span>
+                            <div className="bg-white p-8 rounded-[2.5rem] shadow-xl border border-slate-50 flex flex-col items-center min-w-[220px] transform hover:scale-105 transition-transform duration-500 ring-15 ring-slate-100/50">
+                                <div className="text-6xl font-black text-royal mb-2">{studentData.stats.totalPoints}</div>
+                                <span className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">إجمالي النقاط التراكمي</span>
                             </div>
                         </div>
                     </div>
 
-                    {/* Records List (Cards) */}
-                    <div className="space-y-4">
-                        <h3 className="font-bold text-xl text-gray-700 px-2">سجل الحضور</h3>
+                    {/* Detailed Records Container */}
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between px-6">
+                            <h3 className="font-black text-2xl text-slate-800 flex items-center gap-3">
+                                <div className="w-1.5 h-8 bg-blue-500 rounded-full"></div>
+                                تفاصيل سجلات الحضور
+                            </h3>
+                            <span className="text-xs font-black text-slate-400 uppercase bg-slate-100 px-4 py-1.5 rounded-full">{studentData.records.length} سجل متاح</span>
+                        </div>
+
                         {studentData.records.length === 0 ? (
-                            <div className="text-center p-10 text-gray-400 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                                لا توجد سجلات حضور لهذا الطالب
+                            <div className="school-card p-20 text-center bg-slate-50/50 border-dashed border-2">
+                                <div className="bg-white w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
+                                    <ClipboardList size={40} className="text-slate-200" />
+                                </div>
+                                <p className="text-xl font-bold text-slate-300">لا توجد أي سجلات حضور في النظام حالياً</p>
                             </div>
                         ) : (
-                            studentData.records.map((r: any) => (
-                                <div key={r.id} className="card p-5 hover:shadow-lg transition-all border border-gray-100 bg-white group hover:-translate-y-1">
-                                    {/* Row 1: Date & Time */}
-                                    <div className="flex justify-between items-center mb-4 border-b border-gray-50 pb-3">
-                                        <div className="flex items-center gap-2 text-gray-700 font-bold text-lg">
-                                            <span className="text-gray-400 text-sm ml-1">التاريخ:</span>
-                                            {r.date}
-                                        </div>
-                                        <div className="flex items-center gap-2 text-gray-700 font-bold text-lg dir-ltr">
-                                            <span className="text-gray-400 text-sm ml-1">وقت الوصول:</span>
-                                            {r.time}
-                                        </div>
-                                    </div>
+                            <div className="grid grid-cols-1 gap-6">
+                                {studentData.records.map((r: any) => (
+                                    <div key={r.id} className="school-card p-8 group hover:border-primary/20 bg-white relative overflow-hidden transition-all duration-300">
+                                        <div className="flex flex-col md:flex-row items-center gap-8">
+                                            {/* Date Circle */}
+                                            <div className="w-24 h-24 rounded-[1.75rem] bg-slate-50 border border-slate-100 flex flex-col items-center justify-center shrink-0 group-hover:bg-primary group-hover:border-primary transition-colors duration-300">
+                                                <span className="text-xs font-black text-slate-400 uppercase group-hover:text-blue-100 transition-colors">بتاريخ</span>
+                                                <span className="text-lg font-black text-slate-700 group-hover:text-white transition-colors">{r.date.split('-')[2]}</span>
+                                                <span className="text-[10px] font-bold text-slate-400 group-hover:text-blue-200 transition-colors uppercase">{r.date.split('-')[1]} | {r.date.split('-')[0]}</span>
+                                            </div>
 
-                                    {/* Row 2: Status & Points */}
-                                    <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                                        <div className="flex-1">
-                                            <div className="font-bold text-lg mb-1">الحالة:</div>
-                                            {r.status === 'early' && <span className="inline-block text-green-700 bg-green-100 px-4 py-2 rounded-lg font-bold shadow-sm">(حضور مبكر)</span>}
-                                            {r.status === 'late' && <span className="inline-block text-orange-700 bg-orange-100 px-4 py-2 rounded-lg font-bold shadow-sm">(حضور متأخر)</span>}
-                                            {r.status === 'absent' && <span className="inline-block text-red-700 bg-red-100 px-4 py-2 rounded-lg font-bold shadow-sm">(غائب)</span>}
-                                        </div>
-                                        <div className="text-center min-w-[100px]">
-                                            <div className="font-bold text-lg mb-1">النقاط:</div>
-                                            <span className={`text-2xl font-black ${r.points > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                                {r.points > 0 ? `+${r.points}` : r.points}
-                                            </span>
-                                        </div>
-                                    </div>
+                                            <div className="flex-1 grid md:grid-cols-3 gap-8 w-full">
+                                                <div className="space-y-1">
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">توقيت الحضور</span>
+                                                    <div className="text-2xl font-black text-slate-800 flex items-center gap-2 dir-ltr justify-end md:justify-start">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                                        {r.time}
+                                                    </div>
+                                                </div>
 
-                                    {/* Row 3: Notes */}
-                                    <div className="bg-gray-50 p-4 rounded-xl text-sm text-gray-600 font-medium leading-relaxed border border-gray-100">
-                                        <span className="font-bold text-gray-800 ml-2">ملاحظات:</span>
-                                        {r.status === 'early' && "شكرا جزيلا لاهتمامكم بالانضباط والحضور المبكر ساهمت في تميز ابنكم."}
-                                        {r.status === 'late' && "نأمل الحرص على الحضور المبكر لضمان الاستفادة الكاملة من الوقت التعليمي."}
-                                        {r.status === 'absent' && "نرجو التواصل مع المدرسة لتبرير الغياب ومتابعة الدروس الفائتة."}
+                                                <div className="space-y-2">
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">التقييم اليومي</span>
+                                                    {r.status === 'early' && <span className="badge badge-success px-4 py-2 font-black text-sm rounded-xl">حضور مبكر</span>}
+                                                    {r.status === 'late' && <span className="badge badge-warning px-4 py-2 font-black text-sm rounded-xl">حضور متأخر</span>}
+                                                    {r.status === 'absent' && <span className="badge badge-danger px-4 py-2 font-black text-sm rounded-xl">غائب تماماً</span>}
+                                                </div>
+
+                                                <div className="space-y-1 md:text-center">
+                                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">مجموع النقاط</span>
+                                                    <div className={`text-4xl font-black ${r.points > 0 ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                        {r.points > 0 ? `+${r.points}` : r.points}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="mt-8 bg-slate-50/50 p-5 rounded-2xl border border-slate-100 text-sm font-bold text-slate-600 leading-relaxed group-hover:bg-white transition-colors">
+                                            <span className="text-primary mr-2 font-black italic">رسالة المؤسسة:</span>
+                                            {r.status === 'early' && "تميزك في الحضور المبكر يعكس طموحك العالي. استمر في هذا التألق."}
+                                            {r.status === 'late' && "نقدر حضورك، ونأمل منك التواجد مبكراً للمشاركة في البرنامج الصباحي الهام."}
+                                            {r.status === 'absent' && "نأسف لغيابك اليوم. يرجى تبرير الغياب لتجنب تأثر نقاطك العامة للمستوى."}
+                                        </div>
                                     </div>
-                                </div>
-                            ))
+                                ))}
+                            </div>
                         )}
                     </div>
-
                 </div>
-            )
-            }
+            )}
 
-            {/* Admin Login Link */}
-            <div className="mt-20 text-center">
-                <button onClick={() => setView('admin')} className="text-xs text-gray-300 hover:text-gray-500 transition-colors">
-                    لوحة التحكم
-                </button>
-            </div>
-
+            {/* Admin Portal Shortcut */}
+            {!studentData && !loading && (
+                <div className="mt-24 text-center group">
+                    <button onClick={() => setView('admin')} className="p-4 rounded-full hover:bg-slate-100 transition-all">
+                        <Lock size={16} className="text-slate-200 group-hover:text-slate-400 mb-2 mx-auto" />
+                        <span className="text-[10px] font-black text-slate-200 group-hover:text-slate-500 uppercase tracking-[0.3em]">بوابة الموظفين</span>
+                    </button>
+                </div>
+            )}
         </div >
     );
 };
