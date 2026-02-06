@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ClipboardList, BookOpen, Medal, ArrowLeft, Star } from 'lucide-react';
+import { ClipboardList, BookOpen, Medal, ArrowLeft, Star, LogOut, UserPlus } from 'lucide-react';
 
 const Dashboard = () => {
     const cards = [
@@ -30,6 +30,24 @@ const Dashboard = () => {
             color: "from-amber-500 to-orange-600",
             shadow: "shadow-amber-500/40",
             delay: "200"
+        },
+        {
+            to: "/exit/login",
+            title: "نظام الاستئذان",
+            description: "إدارة طلبات استئذان الطلاب وخروجهم المبكر",
+            icon: <LogOut size={40} className="text-white" />,
+            color: "from-rose-500 to-red-700",
+            shadow: "shadow-rose-500/40",
+            delay: "300"
+        },
+        {
+            to: "/visiting",
+            title: "سجل الزوار",
+            description: "تنظيم وتوثيق دخول وخروج زوار المدرسة",
+            icon: <UserPlus size={40} className="text-white" />,
+            color: "from-blue-500 to-cyan-700",
+            shadow: "shadow-blue-500/40",
+            delay: "400"
         }
     ];
 
