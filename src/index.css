@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap');
 
 @theme {
   --color-primary: #1e3a8a;
@@ -17,8 +18,6 @@
   --font-sans: 'Cairo', sans-serif;
   --font-display: 'Tajawal', sans-serif;
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Tajawal:wght@500;700;800;900&display=swap');
 
 @layer base {
   body {

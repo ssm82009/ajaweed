@@ -1,4 +1,4 @@
-import { School, Menu, X, Landmark, GraduationCap } from 'lucide-react';
+import { Menu, X, Landmark, GraduationCap } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
