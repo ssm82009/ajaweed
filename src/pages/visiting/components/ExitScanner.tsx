@@ -38,22 +38,24 @@ const ExitScanner: React.FC = () => {
     // const exitLink = `${window.location.protocol}//${window.location.host}/exit`;
 
     return (
-        <div className="card" style={{ textAlign: 'center' }}>
-            <h2>تسجيل الخروج الذكي</h2>
+        <div className="visiting-system-scope">
+            <div className="card" style={{ textAlign: 'center' }}>
+                <h2>تسجيل الخروج الذكي</h2>
 
-            <div style={{ margin: '2rem 0', minHeight: '100px', alignContent: 'center' }}>
-                {status === 'loading' && <div className="spinner"></div>}
-                <p style={{
-                    whiteSpace: 'pre-line',
-                    fontSize: '1.1rem',
-                    fontWeight: 'bold',
-                    color: status === 'success' ? '#4ade80' : status === 'error' ? '#f87171' : 'white'
-                }}>
-                    {status === 'loading' ? 'جاري التحقق من هويتك...' : msg}
-                </p>
+                <div style={{ margin: '2rem 0', minHeight: '100px', alignContent: 'center' }}>
+                    {status === 'loading' && <div className="spinner"></div>}
+                    <p style={{
+                        whiteSpace: 'pre-line',
+                        fontSize: '1.1rem',
+                        fontWeight: 'bold',
+                        color: status === 'success' ? '#4ade80' : status === 'error' ? '#f87171' : 'white'
+                    }}>
+                        {status === 'loading' ? 'جاري التحقق من هويتك...' : msg}
+                    </p>
+                </div>
+
+                <button className="primary-btn" onClick={() => navigate('/')}>العودة للرئيسية</button>
             </div>
-
-            <button className="primary-btn" onClick={() => navigate('/')}>العودة للرئيسية</button>
         </div>
     );
 };

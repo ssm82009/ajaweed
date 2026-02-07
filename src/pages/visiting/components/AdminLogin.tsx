@@ -23,19 +23,21 @@ const AdminLogin: React.FC = () => {
     };
 
     return (
-        <div className="card" style={{ maxWidth: '400px', margin: '2rem auto' }}>
-            <h2>دخول المسؤول</h2>
-            <div className="input-group">
-                <label>اسم المستخدم</label>
-                <input type="text" value={creds.username} onChange={e => setCreds({ ...creds, username: e.target.value })} />
+        <div className="visiting-system-scope">
+            <div className="card" style={{ maxWidth: '400px', margin: '2rem auto' }}>
+                <h2>دخول المسؤول</h2>
+                <div className="input-group">
+                    <label>اسم المستخدم</label>
+                    <input type="text" value={creds.username} onChange={e => setCreds({ ...creds, username: e.target.value })} />
+                </div>
+                <div className="input-group">
+                    <label>كلمة المرور</label>
+                    <input type="password" value={creds.password} onChange={e => setCreds({ ...creds, password: e.target.value })} />
+                </div>
+                {error && <p className="error-msg">{error}</p>}
+                <button className="primary-btn" onClick={handleLogin}>دخول</button>
+                <button className="secondary-btn" onClick={() => navigate('/visiting')}>عودة للرئيسية</button>
             </div>
-            <div className="input-group">
-                <label>كلمة المرور</label>
-                <input type="password" value={creds.password} onChange={e => setCreds({ ...creds, password: e.target.value })} />
-            </div>
-            {error && <p className="error-msg">{error}</p>}
-            <button className="primary-btn" onClick={handleLogin}>دخول</button>
-            <button className="secondary-btn" onClick={() => navigate('/visiting')}>عودة للرئيسية</button>
         </div>
     );
 };

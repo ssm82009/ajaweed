@@ -1,4 +1,5 @@
-:root {
+/* Scoped Visiting System Styles */
+.visiting-system-scope {
   --primary: #1e3a8a;
   --primary-dark: #1e40af;
   --secondary: #3b82f6;
@@ -7,9 +8,14 @@
   --text: #0f172a;
   --text-dim: #64748b;
   --font-family: 'Cairo', sans-serif;
+
+  font-family: var(--font-family);
+  color: var(--text);
+  background-color: var(--background);
+  min-height: 100vh;
 }
 
-.card {
+.visiting-system-scope .card {
   background: #ffffff;
   border-radius: 2rem;
   padding: 2.5rem;
@@ -18,28 +24,29 @@
   animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-h1,
-h2,
-h3 {
+.visiting-system-scope h1,
+.visiting-system-scope h2,
+.visiting-system-scope h3 {
   margin-top: 0;
   color: var(--primary);
   font-weight: 800;
 }
 
-h1 {
+.visiting-system-scope h1 {
   font-size: 2.25rem;
   text-align: center;
   margin-bottom: 2.5rem;
   background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.input-group {
+.visiting-system-scope .input-group {
   margin-bottom: 1.75rem;
 }
 
-label {
+.visiting-system-scope label {
   display: block;
   margin-bottom: 0.75rem;
   color: var(--text-dim);
@@ -49,10 +56,10 @@ label {
   letter-spacing: 0.025em;
 }
 
-input[type="text"],
-input[type="number"],
-input[type="tel"],
-textarea {
+.visiting-system-scope input[type="text"],
+.visiting-system-scope input[type="number"],
+.visiting-system-scope input[type="tel"],
+.visiting-system-scope textarea {
   width: 100%;
   padding: 0.85rem 1.15rem;
   border-radius: 1rem;
@@ -64,14 +71,14 @@ textarea {
   box-sizing: border-box;
 }
 
-input:focus,
-textarea:focus {
+.visiting-system-scope input:focus,
+.visiting-system-scope textarea:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
-button.primary-btn {
+.visiting-system-scope button.primary-btn {
   width: 100%;
   padding: 1rem;
   border-radius: 1rem;
@@ -85,40 +92,45 @@ button.primary-btn {
   box-shadow: 0 4px 12px rgba(30, 58, 138, 0.2);
 }
 
-button.primary-btn:hover {
+.visiting-system-scope button.primary-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(30, 58, 138, 0.3);
 }
 
-button.primary-btn:active {
+.visiting-system-scope button.primary-btn:active {
   transform: scale(0.98);
 }
 
-button.secondary-btn {
+.visiting-system-scope button.secondary-btn {
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   color: var(--text-dim);
   padding: 0.75rem 1.5rem;
   border-radius: 0.85rem;
   cursor: pointer;
-  margin-top: 1.25rem;
+  margin: 1.25rem auto 0;
+  display: block;
   font-weight: 700;
   transition: all 0.2s;
 }
 
-button.secondary-btn:hover {
+.visiting-system-scope .input-group.center-items {
+  text-align: center;
+}
+
+.visiting-system-scope button.secondary-btn:hover {
   background: #f1f5f9;
   color: var(--text);
 }
 
-.step-indicator {
+.visiting-system-scope .step-indicator {
   display: flex;
   justify-content: center;
   gap: 0.75rem;
   margin-bottom: 2.5rem;
 }
 
-.step-dot {
+.visiting-system-scope .step-dot {
   width: 0.6rem;
   height: 0.6rem;
   border-radius: 50%;
@@ -126,28 +138,42 @@ button.secondary-btn:hover {
   transition: all 0.3s;
 }
 
-.step-dot.active {
+.visiting-system-scope .step-dot.active {
   background: var(--primary);
   transform: scale(1.4);
 }
 
-.step-dot.completed {
+.visiting-system-scope .step-dot.completed {
   background: var(--secondary);
 }
 
-.signature-pad {
-  border: 2px dashed #e2e8f0;
+.visiting-system-scope .signature-pad {
+  border: 2px dashed #cbd5e1;
   border-radius: 1.25rem;
-  background: #f8fafc;
+  background: #ffffff;
   overflow: hidden;
-  transition: border-color 0.2s;
+  transition: all 0.2s;
+  width: 100%;
+  max-width: 400px;
+  height: 160px;
+  margin: 1.5rem auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 }
 
-.signature-pad:hover {
+.visiting-system-scope .sigCanvas {
+  width: 100% !important;
+  height: 100% !important;
+  cursor: crosshair;
+}
+
+.visiting-system-scope .signature-pad:hover {
   border-color: var(--secondary);
 }
 
-.qr-result {
+.visiting-system-scope .qr-result {
   text-align: center;
   padding: 2.5rem;
   background: #f8fafc;
@@ -169,7 +195,7 @@ button.secondary-btn:hover {
   }
 }
 
-.declaration-box {
+.visiting-system-scope .declaration-box {
   background: #fff1f2;
   border: 1px solid #fecdd3;
   padding: 1.25rem;
@@ -181,7 +207,7 @@ button.secondary-btn:hover {
   font-weight: 600;
 }
 
-.checkbox-wrapper {
+.visiting-system-scope .checkbox-wrapper {
   display: flex;
   align-items: flex-start;
   gap: 0.85rem;
@@ -189,14 +215,14 @@ button.secondary-btn:hover {
   padding: 0.5rem;
 }
 
-.checkbox-wrapper input {
+.visiting-system-scope .checkbox-wrapper input {
   margin-top: 0.35rem;
   width: 1.25rem;
   height: 1.25rem;
   accent-color: var(--primary);
 }
 
-.error-msg {
+.visiting-system-scope .error-msg {
   color: #e11d48;
   font-size: 0.85rem;
   margin-top: 0.75rem;
@@ -220,6 +246,30 @@ button.secondary-btn:hover {
   }
 }
 
-.pulse-text {
+.visiting-system-scope .pulse-text {
   animation: pulse-animation 2s infinite ease-in-out;
+}
+
+.visiting-system-scope .confirmation-box {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.25rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: right;
+}
+
+.visiting-system-scope .confirmation-box p {
+  margin: 0.75rem 0 !important;
+  color: #1e3a8a !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  line-height: 1.4 !important;
+}
+
+.visiting-system-scope .confirmation-box strong {
+  color: #64748b !important;
+  font-weight: 800;
+  display: inline-block;
+  min-width: 100px;
 }

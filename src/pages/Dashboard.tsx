@@ -112,27 +112,30 @@ const Dashboard = () => {
                         </Link>
                     ))}
 
-                    {/* Announcement Card - High Contrast Official */}
-                    <div className="md:col-span-2 lg:col-span-1 school-card bg-primary border-none p-12 flex flex-col justify-between text-white group overflow-hidden shadow-2xl shadow-primary/40">
-                        <div className="absolute top-0 right-0 p-10 opacity-10 transform scale-150 rotate-12 transition-transform duration-700 group-hover:rotate-0">
-                            <Bell size={200} />
+                    {/* Announcement Card - Redesigned to match others */}
+                    <div className="md:col-span-2 lg:col-span-1 school-card group flex flex-col items-center text-center p-12 relative overflow-hidden">
+                        {/* Icon Container */}
+                        <div className="w-24 h-24 mb-10 rounded-[2.5rem] bg-blue-600 flex items-center justify-center text-white shadow-2xl shadow-blue-600/20 transform group-hover:rotate-12 transition-all duration-500">
+                            <Bell size={32} />
                         </div>
 
-                        <div className="relative z-10 space-y-8">
-                            <div className="w-16 h-16 rounded-3xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
-                                <Bell size={32} className="text-amber-300" />
-                            </div>
-                            <h3 className="text-4xl font-black text-white !important">إعلانات هامة</h3>
-                            <p className="text-blue-100 text-xl font-bold leading-relaxed">
-                                تم تفعيل كافة الأنظمة الجديدة. يرجى مراجعة التقارير اليومية لضمان دقة البيانات المحفوظة.
-                            </p>
+                        <h3 className="text-3xl font-black mb-6 group-hover:text-blue-600 transition-colors">
+                            إعلانات هامة
+                        </h3>
+
+                        <p className="text-slate-500 font-bold leading-relaxed mb-12 opacity-90">
+                            تم تفعيل كافة الأنظمة الجديدة. يرجى مراجعة التقارير اليومية لضمان دقة البيانات المحفوظة.
+                        </p>
+
+                        {/* Pagination Dots */}
+                        <div className="mt-auto flex gap-3 justify-center w-full">
+                            <div className="h-2 w-8 bg-blue-600 rounded-full"></div>
+                            <div className="h-2 w-2 bg-slate-200 rounded-full hover:bg-slate-300 cursor-pointer transition-colors"></div>
+                            <div className="h-2 w-2 bg-slate-200 rounded-full hover:bg-slate-300 cursor-pointer transition-colors"></div>
                         </div>
 
-                        <div className="relative z-10 flex gap-3 mt-16">
-                            <div className="h-2 w-20 bg-white rounded-full"></div>
-                            <div className="h-2 w-6 bg-white/30 rounded-full hover:bg-white/50 cursor-pointer transition-colors"></div>
-                            <div className="h-2 w-6 bg-white/30 rounded-full hover:bg-white/50 cursor-pointer transition-colors"></div>
-                        </div>
+                        {/* Decorative Background Blob */}
+                        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-700 -z-10"></div>
                     </div>
                 </div>
             </div>
