@@ -1,5 +1,5 @@
 import '../../../assets/styles/visiting.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,6 +7,11 @@ const AdminLogin: React.FC = () => {
     const [creds, setCreds] = useState({ username: '', password: '' });
     const [error, setError] = useState('');
     const navigate = useNavigate();
+
+    // Scroll to top on component mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     const handleLogin = async () => {
         try {

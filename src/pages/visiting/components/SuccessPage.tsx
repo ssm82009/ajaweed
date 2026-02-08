@@ -1,11 +1,16 @@
 import '../../../assets/styles/visiting.css';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const SuccessPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { serial } = location.state || { serial: '---' };
+
+    // Scroll to top on component mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     return (
         <div className="visiting-system-scope">

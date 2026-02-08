@@ -4,10 +4,7 @@ import {
     BookOpen,
     Medal,
     ArrowLeft,
-    LogOut,
-    UserPlus,
-    LayoutDashboard,
-    Bell
+    LayoutDashboard
 } from 'lucide-react';
 
 const Dashboard = () => {
@@ -38,24 +35,6 @@ const Dashboard = () => {
             accent: "bg-amber-600",
             lightAccent: "bg-amber-50",
             textColor: "text-amber-950"
-        },
-        {
-            to: "/exit/login",
-            title: "نظام الاستئذان",
-            description: "إدارة إلكترونية شاملة لطلبات استئذان الطلاب وخروجهم المبكر",
-            icon: <LogOut size={32} />,
-            accent: "bg-rose-600",
-            lightAccent: "bg-rose-50",
-            textColor: "text-rose-950"
-        },
-        {
-            to: "/visiting",
-            title: "سجل الزوار",
-            description: "تنظيم وتوثيق احترافي لدخول وخروج زوار المدرسة مع إشعارات",
-            icon: <UserPlus size={32} />,
-            accent: "bg-sky-600",
-            lightAccent: "bg-sky-50",
-            textColor: "text-sky-950"
         }
     ];
 
@@ -112,31 +91,7 @@ const Dashboard = () => {
                         </Link>
                     ))}
 
-                    {/* Announcement Card - Redesigned to match others */}
-                    <div className="md:col-span-2 lg:col-span-1 school-card group flex flex-col items-center text-center p-12 relative overflow-hidden">
-                        {/* Icon Container */}
-                        <div className="w-24 h-24 mb-10 rounded-[2.5rem] bg-blue-600 flex items-center justify-center text-white shadow-2xl shadow-blue-600/20 transform group-hover:rotate-12 transition-all duration-500">
-                            <Bell size={32} />
-                        </div>
 
-                        <h3 className="text-3xl font-black mb-6 group-hover:text-blue-600 transition-colors">
-                            إعلانات هامة
-                        </h3>
-
-                        <p className="text-slate-500 font-bold leading-relaxed mb-12 opacity-90">
-                            تم تفعيل كافة الأنظمة الجديدة. يرجى مراجعة التقارير اليومية لضمان دقة البيانات المحفوظة.
-                        </p>
-
-                        {/* Pagination Dots */}
-                        <div className="mt-auto flex gap-3 justify-center w-full">
-                            <div className="h-2 w-8 bg-blue-600 rounded-full"></div>
-                            <div className="h-2 w-2 bg-slate-200 rounded-full hover:bg-slate-300 cursor-pointer transition-colors"></div>
-                            <div className="h-2 w-2 bg-slate-200 rounded-full hover:bg-slate-300 cursor-pointer transition-colors"></div>
-                        </div>
-
-                        {/* Decorative Background Blob */}
-                        <div className="absolute -bottom-12 -left-12 w-48 h-48 bg-blue-50 rounded-full blur-3xl opacity-0 group-hover:opacity-60 transition-opacity duration-700 -z-10"></div>
-                    </div>
                 </div>
             </div>
         </div>

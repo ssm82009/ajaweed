@@ -10,6 +10,11 @@ const ExitScanner: React.FC = () => {
     const [msg, setMsg] = useState('جاري تسجيل الخروج...');
     // const [debugIp, setDebugIp] = useState('');
 
+    // Scroll to top on component mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     // Auto-checkout on component mount
     useEffect(() => {
         handleCheckout();

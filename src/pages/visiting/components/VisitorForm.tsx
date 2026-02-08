@@ -11,6 +11,11 @@ const VisitorForm: React.FC = () => {
     const sigPad = useRef<SignatureCanvas>(null);
     const [errors, setErrors] = useState<string>('');
 
+    // Scroll to top on component mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const [formData, setFormData] = useState({
         visitor_name: '',
         id_number: '',

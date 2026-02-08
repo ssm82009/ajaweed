@@ -11,6 +11,11 @@ const AdminDashboard: React.FC = () => {
     const [settings, setSettings] = useState<any>({});
     const [dateFilter, setDateFilter] = useState(new Date().toISOString().slice(0, 10));
 
+    // Scroll to top on component mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     // Load data
     useEffect(() => {
         loadSettings(); // Always load settings to get header title

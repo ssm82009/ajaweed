@@ -13,6 +13,7 @@
   color: var(--text);
   background-color: var(--background);
   min-height: 100vh;
+  padding-top: 6rem;
 }
 
 .visiting-system-scope .card {
