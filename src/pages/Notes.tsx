@@ -28,8 +28,13 @@ const Notes = () => {
                 if (role === 'teacher') navigate('/teacher-dashboard');
                 else navigate('/student-dashboard');
             }
-        } catch (err) {
-            setError('رقم الهوية غير مسجل في النظام');
+        } catch (err: any) {
+            if (err.response && err.response.status === 404) {
+                setError('رقم الهوية غير مسجل في النظام');
+            } else {
+                setError('حدث خطأ في الاتصال بالخادم. يرجى المحاولة لاحقاً');
+                console.error('Login error:', err);
+            }
         }
     };
 

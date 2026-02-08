@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Award, Star, Medal, Crown, Sparkles, Calendar } from 'lucide-react';
+import { Award, Star, Medal, Crown, Sparkles, Calendar, Shield } from 'lucide-react';
 
 const HonorBoard = () => {
     const [honors, setHonors] = useState<any[]>([]);
+    const [error, setError] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -11,8 +12,10 @@ const HonorBoard = () => {
             try {
                 const res = await axios.get('/api/honor');
                 setHonors(res.data.data);
+                setError(false);
             } catch (err) {
                 console.error(err);
+                setError(true);
             } finally {
                 setLoading(false);
             }
@@ -65,13 +68,21 @@ const HonorBoard = () => {
                         </div>
                     ))}
                 </div>
+            ) : error ? (
+                <div className="school-card py-32 text-center max-w-4xl mx-auto border-red-100 bg-red-50/30">
+                    <div className="w-40 h-40 bg-white rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-red-100 shadow-xl">
+                        <Shield size={80} className="text-red-300" />
+                    </div>
+                    <h3 className="text-4xl font-black text-red-500">مشكلة في الاتصال</h3>
+                    <p className="text-slate-400 font-bold mt-6 text-xl">تعذر جلب البيانات من الخادم، يرجى إعادة المحاولة لاحقاً</p>
+                </div>
             ) : honors.length === 0 ? (
-                <div className="school-card py-32 text-center max-w-4xl mx-auto border-dashed border-4">
+                <div className="school-card py-32 text-center max-w-4xl mx-auto border-dashed border-4 border-slate-200">
                     <div className="w-40 h-40 bg-slate-50 rounded-[2.5rem] flex items-center justify-center mx-auto mb-10 border border-slate-100 shadow-inner group transition-transform hover:rotate-12 duration-500">
                         <Award size={80} className="text-slate-200" />
                     </div>
-                    <h3 className="text-4xl font-black text-slate-300">سجل التميز قيد التحديث</h3>
-                    <p className="text-slate-400 font-bold mt-6 text-xl">كن أول من يسطر اسمه هنا بالاجتهاد والمثابرة!</p>
+                    <h3 className="text-4xl font-black text-slate-300 text-center w-full">سجل التميز قيد التحديث</h3>
+                    <p className="text-slate-400 font-bold mt-6 text-xl text-center w-full">كن أول من يسطر اسمه هنا بالاجتهاد والمثابرة!</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">

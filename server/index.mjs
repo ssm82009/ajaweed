@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 import multer from 'multer';
 import XLSX from 'xlsx';
 import fs from 'fs';
-import db from './db.mjs';
+import { db, testConnection } from './db.mjs';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
@@ -16,11 +16,25 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Test database connection on startup
+testConnection().then(success => {
+    if (!success) {
+        console.log('Warning: Database connection failed. The application may not function correctly.');
+        console.log('Please check your Turso credentials in the .env file.');
+    }
+});
+
 // Configure Multer for file upload
 const upload = multer({ dest: 'uploads/' });
 
 app.use(cors());
 app.use(express.json());
+
+// Request logging middleware
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
 // Middleware for validating JWT for EXIT system
 const authenticateExitToken = (req, res, next) => {
@@ -102,7 +116,12 @@ app.post('/api/upload-students', upload.single('file'), async (req, res) => {
             let class_name = row['الفصل'] || values[3];
             if (name && national_id) {
                 statements.push({
-                    sql: `INSERT OR REPLACE INTO students (name, national_id, grade, class_name) VALUES (?, ?, ?, ?)`,
+                    sql: `INSERT INTO students (name, national_id, grade, class_name) 
+                          VALUES (?, ?, ?, ?) 
+                          ON CONFLICT(national_id) DO UPDATE SET 
+                          name=excluded.name, 
+                          grade=excluded.grade, 
+                          class_name=excluded.class_name`,
                     args: [name, national_id, grade, class_name]
                 });
             }
@@ -154,7 +173,11 @@ app.post('/api/upload-teachers', upload.single('file'), async (req, res) => {
 
             if (name && national_id) {
                 statements.push({
-                    sql: `INSERT OR REPLACE INTO teachers (name, national_id, subject) VALUES (?, ?, ?)`,
+                    sql: `INSERT INTO teachers (name, national_id, subject) 
+                          VALUES (?, ?, ?) 
+                          ON CONFLICT(national_id) DO UPDATE SET 
+                          name=excluded.name, 
+                          subject=excluded.subject`,
                     args: [name, national_id, subject]
                 });
             }
