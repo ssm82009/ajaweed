@@ -310,8 +310,9 @@ const VisitorForm: React.FC = () => {
                     </div>
                 )}
 
-                <div style={{ marginTop: '2rem', textAlign: 'center', opacity: 0.3 }}>
-                    <small onClick={() => navigate('/visiting/exit')}>تسجيل خروج (QR Scan)</small>
+                <div style={{ marginTop: '3rem', display: 'flex', justifyContent: 'center', gap: '2rem', opacity: 0.6 }}>
+                    <span onClick={() => navigate('/visiting/exit')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>تسجيل خروج</span>
+                    <span onClick={() => navigate('/visiting/admin')} style={{ cursor: 'pointer', textDecoration: 'underline' }}>دخول المشرف</span>
                 </div>
             </div>
         </div>
