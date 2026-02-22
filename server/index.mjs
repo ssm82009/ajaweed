@@ -783,26 +783,71 @@ app.get('/api/visiting/settings/public', async (req, res) => {
 });
 
 const visitingOtpStore = new Map();
+
+// الإعدادات الافتراضية
+const defaultSmsSettings = {
+    'sms_api_key': 'LP0o4xqKwyKJmd42dfZPgNTuS6OdxQHjKQyeKgri560e2a02',
+    'sms_sender': 'School1',
+    'sms_enabled': 'true'
+};
+
 app.post('/api/visiting/send-otp', async (req, res) => {
     const { mobile_number } = req.body;
+    // توليد كود عشوائي من 4 أرقام
     const code = Math.floor(1000 + Math.random() * 9000).toString();
+
+    // حفظ الكود مؤقتاً لمدة 5 دقائق
     visitingOtpStore.set(mobile_number, { code, expires: Date.now() + 300000 });
 
     try {
+        // جلب إعدادات SMS من قاعدة البيانات
         const resSettings = await db.execute("SELECT * FROM visiting_settings WHERE key IN ('sms_api_key', 'sms_sender', 'sms_enabled')");
-        const settings = resSettings.rows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
+        const dbSettings = resSettings.rows.reduce((acc, row) => ({ ...acc, [row.key]: row.value }), {});
 
+        const settings = {
+            sms_api_key: dbSettings.sms_api_key || defaultSmsSettings.sms_api_key,
+            sms_sender: dbSettings.sms_sender || defaultSmsSettings.sms_sender,
+            sms_enabled: dbSettings.sms_enabled || defaultSmsSettings.sms_enabled
+        };
+
+        // إذا كانت الخدمة مفعلة، يتم الإرسال عبر axios إلى مزود الخدمة
         if (settings.sms_enabled === 'true' && settings.sms_api_key) {
             const message = `رمز التحقق الخاص بك هو: ${code}`;
-            const encodedMsg = encodeURIComponent(message);
-            const url = `http://api.almadar.net.sa/sms/sms.aspx?apikey=${settings.sms_api_key}&message=${encodedMsg}&sender=${settings.sms_sender || 'ALJAWAD'}&numbers=${mobile_number}`;
-            await axios.get(url);
-            res.json({ success: true, message: 'SMS Sent' });
+
+            // تنسيق رقم الجوال للبدء بـ 966
+            let formattedNumber = mobile_number.trim();
+            if (formattedNumber.startsWith('0')) {
+                formattedNumber = '966' + formattedNumber.substring(1);
+            } else if (!formattedNumber.startsWith('966')) {
+                formattedNumber = '966' + formattedNumber;
+            }
+
+            const url = 'https://app.mobile.net.sa/api/v1/send';
+
+            try {
+                await axios.post(url, {
+                    number: formattedNumber,
+                    senderName: settings.sms_sender || 'School1',
+                    sendAtOption: 'Now',
+                    messageBody: message
+                }, {
+                    headers: {
+                        'Authorization': `Bearer ${settings.sms_api_key}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    }
+                });
+                res.json({ success: true, message: 'SMS Sent' });
+            } catch (postError) {
+                console.error("SMS POST Error:", postError?.response?.data || postError.message);
+                res.json({ success: true, message: 'SMS Failed', debug_code: code });
+            }
         } else {
+            // نمط التجربة (Simulation) في حال عدم التفعيل
             res.json({ success: true, message: 'Simulation Mode', debug_code: code });
         }
     } catch (err) {
-        res.json({ success: true, message: 'SMS Failed but simulated', debug_code: code });
+        res.json({ success: true, message: 'Simulated (Error)', debug_code: code });
     }
 });
 
